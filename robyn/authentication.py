@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any, Coroutine, Optional, Union
 
 from robyn.robyn import Headers, Identity, Request, Response
 from robyn.status_codes import HTTP_401_UNAUTHORIZED
@@ -64,7 +64,7 @@ class AuthenticationHandler(ABC):
         )
 
     @abstractmethod
-    def authenticate(self, request: Request) -> Optional[Identity]:
+    def authenticate(self, request: Request) -> Union[Optional[Identity], Coroutine[Any, Any, Optional[Identity]]]:
         """
         Authenticates the user.
         :param request: The request object.

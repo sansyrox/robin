@@ -289,16 +289,32 @@ class MiddlewareRouter(BaseRouter):
         injected_dependencies: dict = {}
 
         def decorator(handler):
-            @wraps(handler)
-            def inner_handler(request: Request, *args):
-                if not self.authentication_handler:
-                    raise AuthenticationNotConfiguredError()
-                identity = self.authentication_handler.authenticate(request)
-                if identity is None:
-                    return self.authentication_handler.unauthorized_response
-                request.identity = identity
+            if inspect.iscoroutinefunction(self.authentication_handler.authenticate):
 
-                return request
+                @wraps(handler)
+                async def inner_handler(request: Request, *args):
+                    if not self.authentication_handler:
+                        raise AuthenticationNotConfiguredError()
+
+                    identity = await self.authentication_handler.authenticate(request)
+                    if identity is None:
+                        return self.authentication_handler.unauthorized_response
+                    request.identity = identity
+
+                    return request
+            else:
+
+                @wraps(handler)
+                def inner_handler(request: Request, *args):
+                    if not self.authentication_handler:
+                        raise AuthenticationNotConfiguredError()
+
+                    identity = self.authentication_handler.authenticate(request)
+                    if identity is None:
+                        return self.authentication_handler.unauthorized_response
+                    request.identity = identity
+
+                    return request
 
             self.add_route(
                 MiddlewareType.BEFORE_REQUEST,
