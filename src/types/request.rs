@@ -5,7 +5,7 @@ use actix_web::{
 };
 use futures_util::StreamExt as _;
 use log::debug;
-use pyo3::types::{PyBytes, PyDict, PyString};
+use pyo3::types::{PyBytes, PyDict, PyList, PyString};
 use pyo3::{exceptions::PyValueError, prelude::*};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -256,25 +256,55 @@ impl PyRequest {
 
     pub fn json(&self, py: Python) -> PyResult<PyObject> {
         match self.body.as_ref(py).downcast::<PyString>() {
-            Ok(python_string) => match serde_json::from_str(python_string.extract()?) {
-                Ok(Value::Object(map)) => {
-                    let dict = PyDict::new(py);
-
-                    for (key, value) in map.iter() {
-                        let py_key = key.to_string().into_py(py);
-                        let py_value = match value {
-                            Value::String(s) => s.as_str().into_py(py),
-                            _ => value.to_string().into_py(py),
-                        };
-
-                        dict.set_item(py_key, py_value)?;
-                    }
-
-                    Ok(dict.into_py(py))
-                }
-                _ => Err(PyValueError::new_err("Invalid JSON object")),
-            },
+            Ok(python_string) => json_string_to_pyobject(py, python_string.extract()?),
             Err(e) => Err(e.into()),
         }
+    }
+}
+
+///serde_json not impl IntoPy<PyObject>  but orphan principle. so use this function
+fn json_string_to_pyobject(py: Python, json_string: &str) -> PyResult<PyObject> {
+    /// Converts a serde_json::Number to a Python object.
+    fn number_to_pyobject(num: serde_json::Number, py: Python) -> PyResult<PyObject> {
+        match num.as_u64() {
+            Some(u) => Ok(u.into_py(py)),
+            None => match num.as_i64() {
+                Some(i) => Ok(i.into_py(py)),
+                None => match num.as_f64() {
+                    Some(f) => Ok(f.into_py(py)),
+                    None => Err(PyErr::new::<pyo3::exceptions::PyTypeError, _>(
+                        "Invalid number format",
+                    )),
+                },
+            },
+        }
+    }
+
+    /// Converts a serde_json::Value to a Python object.
+    fn value_to_pyobject(py: Python, value: serde_json::Value) -> PyResult<PyObject> {
+        match value {
+            Value::Null => Ok(().into_py(py)),
+            Value::Bool(b) => Ok(b.into_py(py)),
+            Value::Number(num) => number_to_pyobject(num, py),
+            Value::String(s) => Ok(s.into_py(py)),
+            Value::Array(array) => array
+                .into_iter()
+                .map(|v| value_to_pyobject(py, v))
+                .collect::<PyResult<Vec<PyObject>>>()
+                .map(|list| PyList::new(py, list).into()),
+            Value::Object(map) => {
+                let dict = PyDict::new(py);
+                for (key, value) in map.into_iter() {
+                    let py_key = key.to_string().into_py(py);
+                    let py_value = value_to_pyobject(py, value)?;
+                    dict.set_item(py_key, py_value)?;
+                }
+                Ok(dict.into_py(py))
+            }
+        }
+    }
+    match serde_json::from_str(json_string) {
+        Ok(value) => value_to_pyobject(py, value),
+        Err(e) => Err(PyValueError::new_err(format!("Invalid JSON: {}", e))),
     }
 }

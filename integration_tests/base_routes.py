@@ -602,6 +602,15 @@ async def request_json(request: Request):
     return json["key"]
 
 
+@app.post("/sync/request_json/json_type")
+async def request_json_type(request: Request):
+    try:
+        jsonobj = request.json()
+    except ValueError:
+        jsonobj = None
+    return jsonify(jsonobj)
+
+
 # --- PUT ---
 
 # dict
@@ -807,6 +816,7 @@ app.add_route("POST", "/sync/post/no_dec", sync_without_decorator)
 app.add_route("GET", "/async/get/no_dec", async_without_decorator)
 app.add_route("PUT", "/async/put/no_dec", async_without_decorator)
 app.add_route("POST", "/async/post/no_dec", async_without_decorator)
+
 
 # ===== Dependency Injection =====
 
