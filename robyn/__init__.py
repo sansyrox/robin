@@ -195,6 +195,12 @@ class Robyn:
         """
         self.directories.append(Directory(route, directory_path, show_files_listing, index_file))
 
+    def set_static_files_directory(self, route: str = "static", static_directory_path: str = "static") -> None:
+        cwd = Path().resolve()
+        assert Path(static_directory_path).is_dir(), f"{static_directory_path} is not a directory of {cwd}"
+
+        self.serve_directory(route, static_directory_path)
+
     def add_request_header(self, key: str, value: str) -> None:
         self.request_headers.append(key, value)
 
@@ -575,6 +581,13 @@ class SubRouter(Robyn):
 
     def options(self, endpoint: str, auth_required: bool = False, openapi_name: str = "", openapi_tags: List[str] = ["options"]):
         return super().options(endpoint=self.__add_prefix(endpoint), auth_required=auth_required, openapi_name=openapi_name, openapi_tags=openapi_tags)
+
+    def set_static_files_directory(self, route: str = "static", static_directory_path: str = "static") -> None:
+        cwd: str = Path().resolve()
+        static_path: str = f"./{self.prefix}/{static_directory_path}"
+        assert Path(static_path).is_dir(), f"{static_path} is not a directory of {cwd}"
+
+        self.serve_directory(f"{self.prefix}/route", static_path)
 
 
 def ALLOW_CORS(app: Robyn, origins: Union[List[str], str]):
