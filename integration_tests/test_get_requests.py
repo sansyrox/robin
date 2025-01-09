@@ -40,6 +40,7 @@ def test_template(function_type: str, session):
         assert r.text.startswith("\n\n<!DOCTYPE html>")
         assert "Jinja2" in r.text
         assert "Robyn" in r.text
+        assert '<a href="/sync/auth">Testing get_function_url</a>' in r.text
 
     check_response(get(f"/{function_type}/template"))
 

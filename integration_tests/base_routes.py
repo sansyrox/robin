@@ -24,6 +24,7 @@ websocket_di.inject(ROUTER_DEPENDENCY="ROUTER DEPENDENCY")
 
 current_file_path = pathlib.Path(__file__).parent.resolve()
 jinja_template = JinjaTemplate(os.path.join(current_file_path, "templates"))
+jinja_template.set_robyn(app)
 
 # ===== Websockets =====
 
