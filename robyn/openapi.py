@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass, field
 from importlib import resources
 from inspect import Signature
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypedDict, Union
 
 from robyn.responses import html
 from robyn.robyn import QueryParams, Response
@@ -389,25 +389,39 @@ class OpenAPI:
             list: "array",
         }
 
+        # Handle basic types
         for type_name in type_mapping:
             if param_type is type_name:
                 properties["type"] = type_mapping[type_name]
                 return properties
 
-        # check for Optional type
-        if param_type.__module__ == "typing":
-            properties["anyOf"] = [{"type": self.get_openapi_type(param_type.__args__[0])}, {"type": "null"}]
-            return properties
-        # check for custom classes and TypedDicts
+        # Handle typing module types (Optional, List, etc)
+        if hasattr(param_type, "__module__") and param_type.__module__ == "typing":
+            origin = typing.get_origin(param_type)
+            args = typing.get_args(param_type)
+
+            # Handle Optional types
+            if origin is Union and type(None) in args:
+                non_none_type = next(t for t in args if t is not type(None))
+                properties["anyOf"] = [{"type": self.get_openapi_type(non_none_type)}, {"type": "null"}]
+                return properties
+
+            # Handle List types
+            elif origin in (list, List):
+                properties["type"] = "array"
+                if args:
+                    item_type = args[0]
+                    properties["items"] = self.get_schema_object("item", item_type)
+                return properties
+
+        # Handle custom classes and TypedDicts
         elif inspect.isclass(param_type):
             properties["type"] = "object"
-
             properties["properties"] = {}
 
-            for e in param_type.__annotations__:
-                properties["properties"][e] = self.get_schema_object(e, param_type.__annotations__[e])
-
-        properties["type"] = "object"
+            if hasattr(param_type, "__annotations__"):
+                for e in param_type.__annotations__:
+                    properties["properties"][e] = self.get_schema_object(e, param_type.__annotations__[e])
 
         return properties
 

@@ -1,7 +1,7 @@
 import os
 import pathlib
 from collections import defaultdict
-from typing import Optional
+from typing import Optional, List
 
 from integration_tests.subroutes import di_subrouter, sub_router
 from robyn import Headers, Request, Response, Robyn, WebSocket, WebSocketConnector, jsonify, serve_file, serve_html
@@ -561,6 +561,11 @@ async def async_dict_post():
 # Body
 
 
+class TestMyRequest(Body):
+    items: List[str]
+    numbers: list[int]
+
+
 @app.post("/sync/body")
 def sync_body_post(request: Request):
     return request.body
@@ -574,6 +579,12 @@ async def async_body_post(request: Request):
 @app.post("/sync/form_data")
 def sync_form_data(request: Request):
     return request.headers["Content-Type"]
+
+
+@app.post("/sync/body/typed")
+def sync_body_typed(body: TestMyRequest):
+    # the server should just start
+    return "This is not tested with a request"
 
 
 # JSON Request
