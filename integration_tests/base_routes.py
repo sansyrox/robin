@@ -474,6 +474,13 @@ def sync_multipart_file(request: Request):
     return {"file_names": list(file_names)}
 
 
+@app.post("/sync/multipart-file-form")
+def sync_multipart_file_form(request: Request):
+    files = request.files
+    file_names = files.keys()
+    return {"form_data": request.form_data, "file_names": list(file_names)}
+
+
 # Queries
 
 
@@ -576,6 +583,11 @@ def sync_form_data(request: Request):
     return request.headers["Content-Type"]
 
 
+@app.post("/sync/simple_form_data")
+def sync_simple_form_data(request: Request):
+    return request.form_data["list_field"]
+
+
 # JSON Request
 
 
@@ -599,6 +611,12 @@ async def async_json_post(request: Request):
 async def request_json(request: Request):
     json = request.json()
     return json["key"]
+
+
+@app.post("/sync/request_json/list")
+async def request_json_list(request: Request):
+    json = request.json()
+    return json["field"]
 
 
 # --- PUT ---

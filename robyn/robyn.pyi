@@ -254,8 +254,8 @@ class Request:
         body (Union[str, bytes]): The body of the request. If the request is a JSON, it will be a dict.
         method (str): The method of the request. e.g. GET, POST, PUT etc.
         url (Url): The url of the request. e.g. https://localhost/user
-        form_data (dict[str, str]): The form data of the request. e.g. {"name": "John"}
-        files (dict[str, bytes]): The files of the request. e.g. {"file": b"file"}
+        form_data (dict[str, Union[list[str], str]]): The form data of the request. e.g. {"name": "John"}
+        files (dict[str, dict[str, Union[list[bytes], bytes]]]): The files of the request. e.g. {"file": {"file_name": b"file"}}
         ip_addr (Optional[str]): The IP Address of the client
         identity (Optional[Identity]): The identity of the client
     """
@@ -266,8 +266,8 @@ class Request:
     body: Union[str, bytes]
     method: str
     url: Url
-    form_data: dict[str, str]
-    files: dict[str, bytes]
+    form_data: dict[str, Union[list[str], str]]
+    files: dict[str, dict[str, Union[list[bytes], bytes]]]
     ip_addr: Optional[str]
     identity: Optional[Identity]
 

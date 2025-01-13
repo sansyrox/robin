@@ -63,6 +63,7 @@ def post(
 
 def multipart_post(
     endpoint: str,
+    form_data: Optional[dict] = None,
     files: Optional[dict] = None,
     expected_status_code: int = 200,
     should_check_response: bool = True,
@@ -77,7 +78,7 @@ def multipart_post(
     """
 
     endpoint = endpoint.strip("/")
-    response = requests.post(f"{BASE_URL}/{endpoint}", files=files)
+    response = requests.post(f"{BASE_URL}/{endpoint}", files=files, data=form_data)
     if should_check_response:
         check_response(response, expected_status_code)
     return response

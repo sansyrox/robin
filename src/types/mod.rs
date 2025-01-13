@@ -1,9 +1,11 @@
+use std::collections::HashMap;
 use log::debug;
 use pyo3::{
     exceptions::PyValueError,
     prelude::*,
-    types::{PyBytes, PyString},
+    types::{PyBool, PyBytes, PyDict, PyFloat, PyInt, PyList, PyString, PyTuple},
 };
+use serde_json::Value;
 
 pub mod function_info;
 pub mod headers;
@@ -81,6 +83,61 @@ pub fn get_body_from_pyobject(body: &PyAny) -> PyResult<Vec<u8>> {
     } else {
         debug!("Could not convert specified body to bytes");
         Ok(vec![])
+    }
+}
+
+pub fn get_form_data_from_pyobject(form_data: &PyAny) -> PyResult<Option<HashMap<String, Value>>> {
+    if let Ok(py_dict) = form_data.downcast::<PyDict>() {
+        let mut map = HashMap::new();
+        for (key, value) in py_dict.iter() {
+            let key_str: String = key.extract()?;
+            let json_value: Value = pyany_to_value(value)?;
+            map.insert(key_str, json_value);
+        }
+        Ok(Some(map))
+    } else {
+        debug!("Could not convert specified form data");
+        Ok(None)
+    }
+}
+
+fn pyany_to_value(obj: &PyAny) -> PyResult<Value> {
+    if obj.is_none() {
+        Ok(Value::Null)
+    } else if let Ok(val) = obj.downcast::<PyBool>() {
+        Ok(Value::Bool(val.is_true()))
+    } else if let Ok(val) = obj.downcast::<PyInt>() {
+        let int_val: i64 = val.extract()?;
+        Ok(Value::Number(int_val.into()))
+    } else if let Ok(val) = obj.downcast::<PyFloat>() {
+        let float_val: f64 = val.extract()?;
+        Ok(Value::Number(serde_json::Number::from_f64(float_val).ok_or_else(|| {
+            PyValueError::new_err("Failed to convert float")
+        })?))
+    } else if let Ok(val) = obj.downcast::<PyString>() {
+        let str_val: String = val.extract()?;
+        Ok(Value::String(str_val))
+    } else if let Ok(val) = obj.downcast::<PyBytes>() {
+        let bytes_val = val.extract::<Vec<u8>>()?.into_iter().map(|c| Value::Number(c.into())).collect();
+        Ok(Value::Array(bytes_val))
+    } else if let Ok(dict) = obj.downcast::<PyDict>() {
+        let mut map = serde_json::Map::new();
+        for (key, value) in dict.iter() {
+            let key_str: String = key.extract()?;
+            let json_value = pyany_to_value(value)?;
+            map.insert(key_str, json_value);
+        }
+        Ok(Value::Object(map))
+    } else if let Ok(list) = obj.downcast::<PyList>() {
+        let vec = list.iter().map(pyany_to_value).collect::<Result<Vec<_>, _>>()?;
+        Ok(Value::Array(vec))
+    } else if let Ok(tuple) = obj.downcast::<PyTuple>() {
+        let vec = tuple.iter().map(pyany_to_value).collect::<Result<Vec<_>, _>>()?;
+        Ok(Value::Array(vec))
+    } else {
+        Err(PyValueError::new_err(
+            "Unsupported Python type for conversion to JSON",
+        ))
     }
 }
 

@@ -11,6 +11,7 @@ from integration_tests.helpers.http_methods_helpers import post
         ("/sync/request_json", '{"hello": "world"', "None"),
         ("/async/request_json", '{"hello": "world"}', "<class 'dict'>"),
         ("/async/request_json", '{"hello": "world"', "None"),
+        ("/sync/request_json/list", '{"hello": "world", "field": ["a=", "b"]}', "['a=', 'b']"),
     ],
 )
 def test_request(route, body, expected_result):
