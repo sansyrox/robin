@@ -49,17 +49,22 @@ impl Response {
         }
     }
 
-    pub fn internal_server_error(headers: Option<&Headers>) -> Self {
+    pub fn internal_server_error(headers: Option<&Headers>, description: Option<String>) -> Self {
         let headers = match headers {
             Some(headers) => headers.clone(),
             None => Headers::new(None),
+        };
+
+        let description = match description {
+            Some(description) => description.into_bytes(),
+            None => "Internal server error".to_owned().into_bytes(),
         };
 
         Self {
             status_code: 500,
             response_type: "text".to_string(),
             headers,
-            description: "Internal server error".to_owned().into_bytes(),
+            description,
             file_path: None,
         }
     }

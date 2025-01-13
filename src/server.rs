@@ -455,12 +455,13 @@ async fn index(
                 return r;
             }
             Err(e) => {
+                let e = e.downcast_ref::<PyErr>().unwrap();
                 error!(
                     "Error while executing before middleware function for endpoint `{}`: {}",
                     req.uri().path(),
-                    get_traceback(e.downcast_ref::<PyErr>().unwrap())
+                    get_traceback(e)
                 );
-                return Response::internal_server_error(None);
+                return Response::internal_server_error(None, Some(get_traceback(e)));
             }
         };
     }
@@ -485,7 +486,7 @@ async fn index(
                     get_traceback(&e)
                 );
 
-                Response::internal_server_error(None)
+                Response::internal_server_error(None, Some(get_traceback(&e)))
             }
         }
     } else {
@@ -521,7 +522,10 @@ async fn index(
         response = match execute_middleware_function(&response, &after_middleware).await {
             Ok(MiddlewareReturn::Request(_)) => {
                 error!("After middleware returned a request");
-                return Response::internal_server_error(Some(&response.headers));
+                return Response::internal_server_error(
+                    Some(&response.headers),
+                    Some("After middleware returned a request".to_string()),
+                );
             }
             Ok(MiddlewareReturn::Response(r)) => {
                 let response = r;
@@ -530,12 +534,16 @@ async fn index(
                 response
             }
             Err(e) => {
+                let e = e.downcast_ref::<PyErr>().unwrap();
                 error!(
                     "Error while executing after middleware function for endpoint `{}`: {}",
                     req.uri().path(),
-                    get_traceback(e.downcast_ref::<PyErr>().unwrap())
+                    get_traceback(e)
                 );
-                return Response::internal_server_error(Some(&response.headers));
+                return Response::internal_server_error(
+                    Some(&response.headers),
+                    Some(get_traceback(e)),
+                );
             }
         };
     }
