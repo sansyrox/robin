@@ -340,10 +340,12 @@ class MiddlewareRouter(BaseRouter):
         def inner(handler):
             @wraps(handler)
             async def async_inner_handler(*args, **kwargs):
+                # add format response here
                 return await handler(*args, **kwargs)
 
             @wraps(handler)
             def inner_handler(*args, **kwargs):
+                # add format response here
                 return handler(*args, **kwargs)
 
             if endpoint is not None:
