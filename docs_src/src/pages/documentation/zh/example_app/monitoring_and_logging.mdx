@@ -1,0 +1,28 @@
+## 监控和日志记录
+
+为了更好地监控应用程序的性能并及时解决潜在问题，蝙蝠侠决定实施全面的监控和日志记录机制。他通过集成第三方库来使用日志记录中间件，从而能够跟踪请求、错误和性能指标。
+
+```python {{ title: '监控和日志记录' }}
+from robyn import Logger
+
+logger = Logger(app)
+
+@app.before_request()
+async def log_request(request: Request):
+    logger.info(f"Received request: %s", request)
+
+@app.after_request()
+async def log_response(response: Response):
+    logger.info(f"Sending response: %s", response)
+```
+
+借助监控和日志记录功能，蝙蝠侠现在能够轻松检测应用程序中的问题，分析其性能表现，确保系统始终保持最佳状态，随时准备协助他打击犯罪。
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/deployment"
+    variant="text"
+    arrow="right"
+    children="部署"
+  />
+</div>

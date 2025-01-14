@@ -1,0 +1,49 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 获取客户端 IP 地址
+
+意识到小丑可能也在使用哥谭警察控制面板后，蝙蝠侠决定在他的应用程序中实现访问者 IP 地址追踪功能。
+
+<Row>
+<Col>
+为了提升性能，他将应用程序扩展到了多个内核，并使用了以下命令：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn
+
+    app = Robyn(__file__)
+
+    @app.get("/")
+    async def h(request):
+        return f"hello to you, {request.ip_addr}"
+
+    ```
+    ```python {{ title: 'typed' }}
+    from robyn import Robyn, Request
+
+    app = Robyn(__file__)
+
+    @app.get("/")
+    async def h(request: Request):
+        return f"hello to you, {request.ip_addr}"
+
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+---
+
+## 下一步
+
+在成功实现 IP 跟踪功能后，蝙蝠侠开始思考如何帮助用户更好地理解和使用他的 API 接口。
+
+为此，Robyn 向他介绍了 OpenAPI 文档功能。
+
+[OpenAPI 文档](/documentation/zh/api_reference/openapi)

@@ -1,0 +1,94 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 子路由器和视图
+
+在实现了基本的应用程序功能后，蝙蝠侠希望将代码库拆分为多个文件，以提高可维护性和扩展性。
+
+此时，Robyn 向他介绍了子路由器和视图的概念。
+
+### 路由器 (Routers)
+
+路由器用于将路由（URL 路径与请求处理函数的映射）组织到不同模块中，从而使应用更加模块化，便于管理和扩展。
+
+例如，如果要为前端功能创建一个路由器，可以创建一个名为 `frontend.py` 的文件，该文件将包含所有与前端相关的路由。
+
+`frontend.py` 文件中的代码示例如下：
+
+```bash
+├── app.py
+├── frontend.py
+├── Dockerfile
+└── requirements.txt
+```
+
+`frontend.py` 文件中的代码示例如下：
+
+```python {{ title: '创建路由器' }}
+# frontend.py
+
+from robyn.templating import JinjaTemplate
+from robyn import SubRouter
+import os
+import pathlib
+
+
+current_file_path = pathlib.Path(__file__).parent.resolve()
+jinja_template = JinjaTemplate(os.path.join(current_file_path, "templates"))
+
+
+frontend = SubRouter(__name__, prefix="/frontend")
+
+@frontend.get("/")
+async def get_frontend(request):
+    context = {"framework": "Robyn", "templating_engine": "Jinja2"}
+    return jinja_template.render_template("index.html", **context)
+```
+
+在 `app.py` 文件中，您可以通过以下方式引入并注册前端路由器：
+
+```python {{ title: '嵌套路由' }}
+# app.py
+
+from .frontend import frontend
+
+
+app.include_router(frontend)
+```
+
+### 视图 (Views)
+
+视图用于组织和处理路由的具体功能，通常涉及同步或异步的请求处理。它侧重于定义路由的行为和处理请求与响应。
+
+例如，如果要为前端创建视图，可以创建一个名为 `frontend.py` 的文件。此文件将包含所有与前端相关的路由。
+
+代码示例如下：
+
+<CodeGroup>
+    ```python {{ title: '创建装饰器下的视图' }}
+    from robyn import SyncView
+
+    @app.view("/sync/view/decorator")
+    def sync_decorator_view():
+        def get():
+            return "Hello, world!"
+
+        def post(request: Request):
+            body = request.body
+            return body
+    ```
+
+
+    ```python {{ title: '创建视图' }}
+    def sync_decorator_view():
+        def get():
+            return "Hello, world!"
+
+        def post(request: Request):
+            body = request.body
+            return body
+
+    app.add_view("/sync/view/decorator", sync_decorator_view)
+    ```
+
+</CodeGroup>

@@ -1,0 +1,147 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 身份验证
+
+为防止无关人员访问犯罪数据，蝙蝠侠为应用程序添加了基于 JWT（JSON Web Token）的身份验证和授权功能，并创建了用户表和用户注册接口。
+
+## 用户模型
+
+蝙蝠侠设计了一个用户模型（User Model），用于表示可以访问该应用程序的用户。
+
+```python {{ title: '基本身份验证请求示例' }}
+# models.py
+from sqlalchemy import Column, Integer, String, Boolean
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+
+
+    def __repr__(self):
+        return "<User(id={id}, username={username}, hashed_password={hashed_password})>".format(
+            id=self.id,
+            username=self.username,
+            hashed_password=self.hashed_password,
+        )
+
+
+```
+
+接着，他在 `crud.py` 文件中新增了一个方法，用于创建用户。
+
+```python {{ title: '基本身份验证请求示例' }}
+# crud.py
+# also need to do pip install passlib[bcrypt]
+
+from sqlalchemy.orm import Session
+from .models import User
+
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+def get_user(db: Session, user_id: int):
+    return db.query(User).filter(User.id == user_id).first()
+
+def create_user(db: Session, user: User):
+    hashed_password = get_password_hash(user.password)
+    db_user = User(username=user.username, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+```
+
+## 鉴权工具
+
+同时，他还实现了一些工具函数，用于处理身份验证操作，包括密码加密与校验。
+
+```python {{ title: '基本身份验证请求示例（bearer token）' }}
+# crud.py
+# also need to do pip install passlib[bcrypt]
+# pip install "python-jose[cryptography]"
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+ALGORITHM = "HS256"
+SECRET_KEY = "your_secret_key"
+
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def decode_access_token(token: str):
+    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+
+def authenticate_user(db: Session, username: str, password: str):
+    user = get_user_by_username(db, username)
+    if user is None:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+
+    created_token = create_access_token(data={"sub": .username})
+    return created_token
+
+
+```
+
+## 用户注册接口
+
+最后，蝙蝠侠新增了用户注册与登录接口，完成用户注册和登录验证功能。
+
+```python {{ title: '设置路由' }}
+from . import crud
+
+@app.post("/users/register")
+async def register_user(request):
+    user = request.json()
+    with SessionLocal() as db:
+        created_user = crud.create_user(db, user)
+    return created_user
+
+@app.post("/users/login")
+async def login_user(request):
+    user = request.json()
+    with SessionLocal() as db:
+        token = crud.authenticate_user(db, **user)
+
+    if token is None:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+
+    return {"access_token": token}
+
+```
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/authentication-middlewares"
+    variant="text"
+    arrow="right"
+    children="下一步: 身份验证中间件"
+  />
+</div>

@@ -1,0 +1,131 @@
+## 使用 Rust 扩展 Robyn
+
+有时，蝙蝠侠可能需要处理 CPU 密集型任务或需要大量内存的操作。在这种情况下，他可能希望使用 Rust 来实现这些任务。Robyn 提供了一种特殊的方式，允许通过 Rust 扩展 Python 代码，并且能够在保持代码热重载特性的同时进行扩展，使代码在许多情况下仍然表现得像解释型语言。
+
+<Row>
+<Col>
+首先，您需要创建一个 Rust 文件，我们将其命名为 `hello_world.rs`。可以通过以下 CLI 命令创建该文件：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    python -m robyn --create-rust-file hello_world
+    ```
+
+    ```python {{title: 'typed'}}
+    python -m robyn --create-rust-file hello_world
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+<Row>
+
+  <Col>
+  然后，您可以打开该文件并开始编写 Rust 代码。例如，假设我们实现一个返回平方值的函数：
+
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```rust
+      // hello_world.rs
+
+      // rustimport:pyo3
+
+      use pyo3::prelude::*;
+
+      #[pyfunction]
+      fn square(n: i32) -> i32 {
+          n * n
+          // 这是一个注释
+      }
+
+      ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+
+  <Col>
+  每个通过 CLI 创建的 Rust 文件都会在文件顶部添加一个特殊注释，Robyn 会根据该注释确定需要导入的依赖项。在此例中，我们导入了 `pyo3` 包。您可以根据需要导入多个包，还可以从 `crates.io` 导入`crates`。例如，如果您希望使用 `rusqlite` 包，可以按如下方式导入：
+
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```rust
+      // rustimport:pyo3
+
+    //:
+    //: [dependencies]
+    //: rusqlite = "0.19.0"
+
+      use pyo3::prelude::*;
+
+      #[pyfunction]
+      fn square(n: i32) -> i32 {
+          n * n * n
+          // 这是另一个注释
+      }
+
+      ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+  接下来，您可以在 Python 代码中导入并使用该 Rust 函数：
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      from hello_world import square
+
+      print(square(5))
+      ```
+
+      ```python {{title: 'typed'}}
+      from hello_world import square
+
+      print(square(5))
+      ```
+    </CodeGroup>
+
+  </Col>
+
+要运行此代码，您需要使用 `--compile-rust-path` 标志来编译 Rust 代码并执行。同时，您还可以使用 `--dev` 标志监控 Rust 代码的变化，并在变化时即时重新编译：
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      python -m robyn --compile-rust-path "." --dev
+      ```
+
+      ```python {{title: 'typed'}}
+      python -m robyn --compile-rust-path "." --dev
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+以下是一个示例，展示了如何在 Robyn 应用中使用 Rust 文件，借助 `rusqlite` 包连接数据库并返回表中的行数：[rusty-sql 示例项目](https://github.com/sansyrox/rusty-sql)
+
+## 下一步
+
+蝙蝠侠很好奇 Robyn 还能做什么。
+
+Robyn 向他透露，这个框架还可以支持 GraphQL。
+
+[GraphQL 支持](/documentation/zh/api_reference/graphql-support)

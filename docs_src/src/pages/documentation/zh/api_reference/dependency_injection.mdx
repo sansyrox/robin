@@ -1,0 +1,107 @@
+export const description = '在此页面中，我们将了解 Robyn 中的依赖注入。'
+
+## 依赖注入
+
+蝙蝠侠想要了解 Robyn 中的依赖注入机制。Robyn 向他介绍了依赖注入的概念以及如何在应用程序中使用它。
+
+Robyn 提供了两种依赖注入方式：
+全局依赖注入和局部依赖注入。
+
+### 应用程序级依赖注入
+
+<Row>
+<Col>
+全局依赖注入用于将依赖项注入到整个应用程序中，注入的依赖项对所有请求都可用。
+</Col>
+  <Col>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+      from robyn import Robyn, ALLOW_CORS
+
+      app = Robyn(__file__)
+      GLOBAL_DEPENDENCY = "GLOBAL DEPENDENCY"
+
+      app.inject_global(GLOBAL_DEPENDENCY=GLOBAL_DEPENDENCY)
+
+      @app.get("/sync/global_di")
+      def sync_global_di(request, global_dependencies):
+        return global_dependencies["GLOBAL_DEPENDENCY"]
+    ```
+
+    ```python {{ title: 'typed' }}
+      from robyn import Robyn, ALLOW_CORS
+
+      app = Robyn(__file__)
+      GLOBAL_DEPENDENCY = "GLOBAL DEPENDENCY"
+
+      app.inject_global(GLOBAL_DEPENDENCY=GLOBAL_DEPENDENCY)
+
+      @app.get("/sync/global_di")
+      def sync_global_di(request, global_dependencies):
+        return global_dependencies["GLOBAL_DEPENDENCY"]
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 路由器级依赖注入
+
+<Row>
+<Col>
+局部依赖注入用于将依赖项注入到特定路由器中，注入的依赖项仅对该路由器的请求有效。
+</Col>
+  <Col>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+      from robyn import Robyn, ALLOW_CORS
+
+      app = Robyn(__file__)
+      ROUTER_DEPENDENCY = "ROUTER DEPENDENCY"
+
+      app.inject(ROUTER_DEPENDENCY=ROUTER_DEPENDENCY)
+
+      @app.get("/sync/global_di")
+      def sync_global_di(r, router_dependencies): # r is the request object
+        return router_dependencies["ROUTER_DEPENDENCY"]
+    ```
+
+    ```python {{ title: 'typed' }}
+      from robyn import Robyn, ALLOW_CORS, Request
+
+      app = Robyn(__file__)
+      ROUTER_DEPENDENCY = "ROUTER DEPENDENCY"
+
+      app.inject(ROUTER_DEPENDENCY=ROUTER_DEPENDENCY)
+
+      @app.get("/sync/global_di")
+      def sync_global_di(r: Request, router_dependencies):
+        return router_dependencies["ROUTER_DEPENDENCY"]
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+  <Col>
+    注意：`router_dependencies` 和 `global_dependencies`
+    是保留参数名，必须按照这些名称使用。参数的顺序不重要，但这两个参数必须位于
+    `request` 参数之后。
+  </Col>
+</Row>
+
+---
+
+## 下一步
+
+由于蝙蝠侠对黑暗面非常熟悉，他对异常处理产生了兴趣。
+
+Robyn 随即向他介绍了异常处理的概念，以及如何通过异常处理来应对应用程序中的各种错误情况。
+
+- [异常处理](/documentation/zh/api_reference/exceptions)

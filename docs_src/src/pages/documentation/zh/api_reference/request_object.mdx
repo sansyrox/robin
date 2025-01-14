@@ -1,0 +1,113 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 请求对象
+
+请求对象是一个数据类，包含了与该次请求相关的所有信息。它会在路由处理程序中作为第一个参数传入。
+
+<Row>
+<Col>
+该请求对象在 Rust 端创建，但会作为数据类暴露给 Python。
+
+<ul>
+<li>
+Attributes:
+</li>
+<li>
+query_params (QueryParams)：请求的查询参数。`例如：/user?id=123 -> {"id": ["123"]}`
+</li>
+<li>
+headers (dict[str, str])：请求的标头。`例如：{"Content-Type": "application/json"}`
+</li>
+<li>
+params (dict[str, str])：请求的路径参数。`例如：/user/:id -> {"id": "123"}`
+</li>
+<li>
+body (Union[str, bytes])：请求的正文。如果请求是 JSON 格式，它就会被解析为字典为一个字典。
+</li>
+<li>
+method (str)：请求的方法。`例如：GET、POST、PUT、DELETE`
+</li>
+<li>
+ip_addr (Optional[str])：客户端的 IP 地址
+</li>
+<li>
+identity (Optional[Identity])：客户端的身份
+</li>
+
+</ul>
+
+</Col>
+  <Col>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @dataclass
+    class Request:
+      """
+      query_params: QueryParams
+      headers: Headers
+      path_params: dict[str, str]
+      body: Union[str, bytes]
+      method: str
+      url: Url
+      form_data: dict[str, str]
+      files: dict[str, bytes]
+      ip_addr: Optional[str]
+      identity: Optional[Identity]
+      """
+    ```
+
+    ```python {{ title: 'typed' }}
+    @dataclass
+    class Request:
+      """
+      query_params: QueryParams
+      headers: Headers
+      path_params: dict[str, str]
+      body: Union[str, bytes]
+      method: str
+      url: Url
+      form_data: dict[str, str]
+      files: dict[str, bytes]
+      ip_addr: Optional[str]
+      identity: Optional[Identity]
+      """
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## Extra Path Parameters
+
+Robyn 支持通过 `*extra` 语法捕获额外的路径参数，这样可以捕获在定义的路由之后的所有额外的路径段。
+
+例如，如果有这样一个路由：
+
+<CodeGroup>
+  ```python
+   @app.get("/sync/extra/*extra") def sync_param_extra(request: Request):
+           extra = request.path_params["extra"] 
+           return extra 
+</CodeGroup>
+
+在 `/sync/extra/` 后的任何路径段都会被捕获到 `extra` 参数中。例如：
+
+<ul>
+  <li>请求 `/sync/extra/foo/bar` 将使得 `extra = "foo/bar`"</li>
+  <li>请求 `/sync/extra/123/456/789` 将使得 `extra = "123/456/789`"</li>
+</ul>
+
+你可以通过 `request.path_params["extra"]` 在路由处理程序中访问这些额外的路径参数。
+
+在处理动态嵌套路由，或者捕获未知数量的路径段时，这个功能将有奇效。
+
+---
+
+## 下一步
+
+接下来，蝙蝠侠希望了解 Robyn 服务器的配置。于是他开始了解 Robyn 环境配置文件的概念。
+
+- [Robyn Env](/documentation/zh/api_reference/robyn_env)

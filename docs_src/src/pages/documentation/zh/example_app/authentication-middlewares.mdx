@@ -1,0 +1,48 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 鉴权与授权中间件
+
+为防止无关人员访问犯罪数据，蝙蝠侠为应用程序添加了基于 JWT（JSON Web Token）的身份验证和授权功能，并创建了用户表和用户注册接口。
+
+```python {{ title: '设置鉴权中间件' }}
+from robyn.authentication import AuthenticationHandler, BearerGetter, Identity
+
+
+class BasicAuthHandler(AuthenticationHandler):
+    def authenticate(self, request: Request):
+        token = self.token_getter.get_token(request)
+
+        try:
+            payload = crud.decode_access_token(token)
+            username = payload["sub"]
+        except Exception:
+            return
+
+        with SessionLocal() as db:
+            user = crud.get_user_by_username(db, username=username)
+
+        return Identity(claims={"user": f"{ user }"})
+
+
+app.configure_authentication(BasicAuthHandler(token_getter=BearerGetter()))
+
+
+@app.get("/users/me", auth_required=True)
+async def get_current_user(request):
+    user = request.identity.claims["user"]
+    return user
+
+
+```
+
+得益于 Robyn 框架，哥谭市警察局现在能高效管理犯罪数据并实时追踪犯罪动态。蝙蝠侠利用该框架成功实现能够实际运用的程序，助力哥谭市打击犯罪。
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/real_time_notifications"
+    variant="text"
+    arrow="right"
+    children="即时通讯"
+  />
+</div>

@@ -1,0 +1,88 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 多进程
+
+蝙蝠侠对 Robyn 多进程环境中变量的行为产生了好奇。
+
+Robyn 向他保证，确实支持在多进程环境中共享变量。换句话说，处理程序可以分派到多个线程中。
+
+在多进程环境中，任何使用的变量都会在多个进程之间共享。
+
+然而，默认情况下，在 Robyn 中使用多线程时，变量并不受到多线程访问的保护。
+
+<Row>
+<Col>
+
+如果需要在进程内保护某个变量，并希望多个线程能够访问该变量，可以使用 <a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Value">`multiprocessing.Value`</a> 来实现所需的保护。
+
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+        import threading
+        import time
+        from multiprocessing import Value
+
+        from robyn import Robyn, Request
+
+        app = Robyn(__file__)
+
+        count = Value("i", 0)
+
+        def counter():
+            while True:
+                count.value += 1
+                time.sleep(0.2)
+                print(count.value, "added 1")
+
+        @app.get("/")
+        def index(request):
+            return f"{count.value}"
+
+        threading.Thread(target=counter, daemon=True).start()
+
+        app.start()
+    ```
+
+    ```python {{ title: 'typed' }}
+        import threading
+        import time
+        from multiprocessing import Value
+
+        from robyn import Robyn, Request
+
+        app = Robyn(__file__)
+
+        count: Value = Value("i", 0)
+
+        def counter():
+            while True:
+                count.value += 1
+                time.sleep(0.2)
+                print(count.value, "added 1")
+
+        @app.get("/")
+        def index(request: Request):
+            return f"{count.value}"
+
+        threading.Thread(target=counter, daemon=True).start()
+
+        app.start()
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+---
+
+## 下一步
+
+蝙蝠侠还想了解是否可以直接在 Robyn 的代码库中使用 Rust。
+
+Robyn 随即向他介绍了如何在 Robyn 中使用 Rust。
+
+[直接使用 Rust](/documentation/zh/api_reference/using_rust_directly)

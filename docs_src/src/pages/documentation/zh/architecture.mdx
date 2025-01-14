@@ -1,0 +1,223 @@
+export const description = 'Robyn 是一个基于 Tokio 运行时的 Python Web 服务器，结合了 Python 和 Rust 的优势，利用工作者事件循环、高效的请求处理、多核扩展，以及引入了“常量请求”功能，在多线程环境中优化缓存响应。'
+
+
+## Robyn 设计文档
+
+## 服务器模型
+
+Robyn 基于多进程、多线程模型构建，结合了 Python 和 Rust 的优势。它使用一个主进程来管理多个工作进程，每个工作进程可以处理多个线程。这种设计使 Robyn 能够高效利用系统资源并处理大量并发请求。
+
+## 主进程
+
+Robyn 的主进程负责初始化服务器、管理工作进程并处理信号。它创建一个套接字，并将其传递给工作进程，允许它们接受连接。主进程使用 Python 实现，为开发者提供熟悉的接口，同时利用 Rust 在核心操作中的高性能。
+
+
+```python
+216:257:robyn/__init__.py
+    def start(self, host: str = "127.0.0.1", port: int = 8080, _check_port: bool = True):
+        """
+        启动服务器
+
+        :param host str: 服务器监听的主机地址
+        :param port int: 服务器监听的端口号
+        :param _check_port bool: 是否检查端口是否已被占用
+        """
+
+        host = os.getenv("ROBYN_HOST", host)
+        port = int(os.getenv("ROBYN_PORT", port))
+        open_browser = bool(os.getenv("ROBYN_BROWSER_OPEN", self.config.open_browser))
+
+        if _check_port:
+            while self.is_port_in_use(port):
+                logger.error("端口 %s 已被占用，请使用其他端口。", port)
+                try:
+                    port = int(input("Enter a different port: "))
+                except Exception:
+                    logger.error("无效的端口号，请输入有效的端口号。")
+                    continue
+
+        logger.info("Robyn 版本：%s", __version__)
+        logger.info("正在启动服务器，地址：http://%s:%s", host, port)
+
+        mp.allow_connection_pickling()
+
+        run_processes(
+            host,
+            port,
+            self.directories,
+            self.request_headers,
+            self.router.get_routes(),
+            self.middleware_router.get_global_middlewares(),
+            self.middleware_router.get_route_middlewares(),
+            self.web_socket_router.get_routes(),
+            self.event_handlers,
+            self.config.workers,
+            self.config.processes,
+            self.response_headers,
+            open_browser,
+        )
+```
+
+
+## 工作进程
+
+Robyn 使用多个工作进程来处理传入的请求。每个工作进程能够管理多个线程，从而实现高效的并发处理。工作进程的数量可以通过 `--processes` 参数配置，默认值为 1。
+
+
+```python
+66:116:robyn/processpool.py
+def init_processpool(
+    directories: List[Directory],
+    request_headers: Headers,
+    routes: List[Route],
+    global_middlewares: List[GlobalMiddleware],
+    route_middlewares: List[RouteMiddleware],
+    web_sockets: Dict[str, WebSocket],
+    event_handlers: Dict[Events, FunctionInfo],
+    socket: SocketHeld,
+    workers: int,
+    processes: int,
+    response_headers: Headers,
+) -> List[Process]:
+    process_pool = []
+    if sys.platform.startswith("win32") or processes == 1:
+        spawn_process(
+            directories,
+            request_headers,
+            routes,
+            global_middlewares,
+            route_middlewares,
+            web_sockets,
+            event_handlers,
+            socket,
+            workers,
+            response_headers,
+        )
+
+        return process_pool
+
+    for _ in range(processes):
+        copied_socket = socket.try_clone()
+        process = Process(
+            target=spawn_process,
+            args=(
+                directories,
+                request_headers,
+                routes,
+                global_middlewares,
+                route_middlewares,
+                web_sockets,
+                event_handlers,
+                copied_socket,
+                workers,
+                response_headers,
+            ),
+        )
+        process.start()
+        process_pool.append(process)
+
+    return process_pool
+```
+
+
+## 工作线程
+
+在每个工作进程中，Robyn 使用多个线程并发处理请求。工作线程的数量可以通过 `--workers` 参数配置。默认情况下，Robyn 每个进程使用一个工作线程。
+
+## Rust 集成
+
+Robyn 的一个独特特性是与 Rust 的集成。核心的服务器功能，包括请求处理和路由，都是用 Rust 实现的。这使得 Robyn 在提供 Python 友好的 API 的同时，能够实现高性能。
+
+
+```python
+76:107:src/server.rs
+    pub fn start(
+        &mut self,
+        py: Python,
+        socket: &PyCell<SocketHeld>,
+        workers: usize,
+    ) -> PyResult<()> {
+        pyo3_log::init();
+
+        if STARTED
+            .compare_exchange(false, true, SeqCst, Relaxed)
+            .is_err()
+        {
+            debug!("Robyn 已经启动...");
+            return Ok(());
+        }
+
+        let raw_socket = socket.try_borrow_mut()?.get_socket();
+
+        let router = self.router.clone();
+        let const_router = self.const_router.clone();
+        let middleware_router = self.middleware_router.clone();
+        let web_socket_router = self.websocket_router.clone();
+        let global_request_headers = self.global_request_headers.clone();
+        let global_response_headers = self.global_response_headers.clone();
+        let directories = self.directories.clone();
+
+        let asyncio = py.import("asyncio")?;
+        let event_loop = asyncio.call_method0("new_event_loop")?;
+        asyncio.call_method1("set_event_loop", (event_loop,))?;
+
+        let startup_handler = self.startup_handler.clone();
+        let shutdown_handler = self.shutdown_handler.clone();
+```
+
+
+## 常量请求（Const Requests）
+
+Robyn 引入了一个优化功能，称为“常量请求”。这个功能允许某些路由在 Rust 层进行缓存，从而减少频繁访问的端点的开销，这些端点返回常量数据。
+
+## 选择工作进程和进程配置
+
+通过调整工作进程和进程的数量，Robyn 的性能可以根据系统资源和应用程序的性质进行优化。
+
+1. 进程数量：
+   设置进程数量为 CPU 核心数（N）。这使得 Robyn 能够充分利用多核系统。
+
+2. 工作线程数量： 
+   使用公式 `2 * N + 1`，其中 N 是 CPU 核心数。这个配置有助于高效处理 I/O 密集型和 CPU 密集型任务。
+
+例如，在一个 4 核的机器上：
+```
+python app.py --processes=4 --workers=9
+```
+
+请记住，最佳配置可能会因应用程序和服务器资源的不同而有所变化。建议进行负载测试，尝试不同的配置，以找到最适合您用例的平衡。
+
+## 扩展考虑
+
+- Robyn 的多进程模型使其能够有效地跨多个 CPU 核心扩展。
+- Python 和 Rust 的结合既便于开发，又能提供高性能。
+- 常量请求功能可以显著提高返回常量输出的路由的性能。
+- 扩展时，考虑进程和工作线程的数量，以找到适合硬件和应用需求的最佳配置。
+
+## 开发模式
+
+Robyn 提供了一个开发模式，可以通过 `--dev` 参数启用。此模式旨在简化开发过程，包含热重载等功能。请注意，在开发者模式下，多进程和多工作线程配置被禁用，以确保开发过程中的一致性。
+
+
+```python
+92:101:robyn/argument_parser.py
+        if self.dev and (self.processes != 1 or self.workers != 1):
+            raise Exception("--processes and --workers shouldn't be used with --dev")
+
+        if self.dev and args.log_level is None:
+            self.log_level = "DEBUG"
+
+        elif args.log_level is None:
+            self.log_level = "INFO"
+        else:
+            self.log_level = args.log_level
+```
+
+
+通过理解这些设计原则并根据需要调整配置，开发者可以利用 Robyn 的独特架构构建高性能的 Web 应用程序，充分利用系统资源。
+
+
+## 设计图
+
+<img src="/architecture/architecture.png" />
+

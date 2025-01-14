@@ -1,0 +1,41 @@
+export const description = '在此页面中，我们将深入了解如何处理表单数据。'
+
+## 表单数据与 Multi-Part 表单数据
+
+蝙蝠侠学会了如何使用 Robyn 处理文件上传。接下来，他希望能处理表单数据。
+
+## 处理 Multi-Part 表单数据
+
+<Row>
+<Col>
+蝙蝠侠上传了一些 Multi-Part 表单数据，并希望使用以下代码来处理这些数据：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.post("/upload")
+    async def upload(request):
+      form_data = request.form_data
+
+      return form_data
+    ```
+    ```python {{ title: 'typed' }}
+    @app.post("/upload")
+    async def upload(request: Request):
+      form_data = request.form_data
+
+      return form_data
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 下一步
+
+现在，蝙蝠侠准备深入了解 Robyn 的高级功能。他希望找到一种方法，在控制面板中实现实时更新。
+
+- [WebSockets](/documentation/zh/api_reference/websockets)

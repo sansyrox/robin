@@ -1,0 +1,240 @@
+export const description =
+  '在此页面中，我们将了解如何在现有的 Robyn 代码库中提供 GraphQL 支持，以更快速地获取数据。'
+
+## GraphQL 支持 [(With Strawberry 🍓)](https://strawberry.rocks/)
+
+目前，GraphQL 支持处于初步摸索阶段。当我们能为视图和视图控制器提供稳定的 API 时，将推出更加稳定的版本。
+
+## 第 1 步：创建虚拟环境
+
+为了确保依赖关系互相独立，我们将使用虚拟环境。
+
+  <CodeGroup title="Virtual Environment">
+
+```bash {{ title: 'pip' }}
+python3 -m venv venv
+```
+
+  </CodeGroup>
+
+## 第 2 步：激活虚拟环境并安装 Robyn
+
+  <CodeGroup title="Activating the virtualenv">
+
+```bash {{ title: 'pip' }}
+source venv/bin/activate
+```
+
+  </CodeGroup>
+
+  <CodeGroup title="Installing Robyn and Strawberry">
+
+```bash {{ title: 'pip' }}
+pip install robyn strawberry-graphql
+```
+
+  </CodeGroup>
+
+## 第 3 步：编写 Robyn 应用
+
+  <CodeGroup title="Code">
+
+```python {{ title: 'python' }}
+from typing import List, Optional
+from robyn import Robyn, jsonify
+import json
+
+import dataclasses
+import strawberry
+import strawberry.utils.graphiql
+
+
+@strawberry.type
+class User:
+  name: str
+
+
+@strawberry.type
+class Query:
+  @strawberry.field
+  def user(self) -> Optional[User]:
+      return User(name="Hello")
+
+
+schema = strawberry.Schema(Query)
+
+app = Robyn(__file__)
+
+
+@app.get("/", const=True)
+async def get():
+  return strawberry.utils.graphiql.get_graphiql_html()
+
+
+@app.post("/")
+async def post(request):
+  body = request.json()
+  query = body["query"]
+  variables = body.get("variables", None)
+  context_value = {"request": request}
+  root_value = body.get("root_value", None)
+  operation_name = body.get("operation_name", None)
+
+  data = await schema.execute(
+      query,
+      variables,
+      context_value,
+      root_value,
+      operation_name,
+  )
+
+  return jsonify(
+      {
+          "data": (data.data),
+          **({"errors": data.errors} if data.errors else {}),
+          **({"extensions": data.extensions} if data.extensions else {}),
+      }
+  )
+
+
+if __name__ == "__main__":
+  app.start(port=8080, host="0.0.0.0")
+```
+
+  </CodeGroup>
+
+接下来，让我们逐行解读以上代码。
+
+<Row>
+<Col>
+这些语句导入了所需的依赖项。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Section 1">
+
+    ```python {{ title: 'python' }}
+    from typing import List, Optional
+
+    from robyn import Robyn, jsonify
+    import json
+
+    import dataclasses
+    import strawberry
+    import strawberry.utils.graphiql
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+在这里，我们实现了一个基本的 `User` 类，并为其定义了 `name` 属性。
+
+然后，我们创建了一个 GraphQl 查询类（`Query` 类型），该查询返回一个 `User` 实例。
+
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Section 2">
+
+    ```python {{ title: 'python' }}
+    @strawberry.type
+    class User:
+        name: str
+
+
+    @strawberry.type
+    class Query:
+        @strawberry.field
+        def user(self) -> Optional[User]:
+            return User(name="Hello")
+
+
+    schema = strawberry.Schema(Query)
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+接下来，我们初始化了一个 Robyn 应用。为了提供 GraphQl 应用，我们需要定义两个路由：一个 GET 路由用于返回 `GraphiQL(ide)`，另一个 POST 路由用于处理 `GraphQl` 请求。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Section 3">
+
+    ```python {{ title: 'python' }}
+    app = Robyn(__file__)
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+我们通过 GraphiQL IDE 使用 `strawberry` 填充 HTML 页面，并设置 `const=True` 以预计算页面内容，从而加快返回速度，避免了 GET 请求的额外执行开销。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Section 4">
+
+    ```python {{ title: 'python' }}
+      @app.get("/", const=True)
+      async def get():
+      return strawberry.utils.graphiql.get_graphiql_html()
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+最后，我们从 `request` 对象中获取参数（如 body、query、variables、context_value、root_value 和 operation_name）。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Section 5">
+
+    ```python {{ title: 'python' }}
+    @app.post("/")
+    async def post(request):
+    body = request.json()
+    query = body["query"]
+    variables = body.get("variables", None)
+    context_value = {"request": request}
+    root_value = body.get("root_value", None)
+    operation_name = body.get("operation_name", None)
+
+    data = await schema.execute(
+        query,
+        variables,
+        context_value,
+        root_value,
+        operation_name,
+    )
+
+    return jsonify(
+        {
+            "data": (data.data),
+            **({"errors": data.errors} if data.errors else {}),
+            **({"extensions": data.extensions} if data.extensions else {}),
+        }
+    )
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+上述代码展示了如何为 Robyn 应用添加 GraphQL 支持。您可以为任意数量的路由执行类似操作。
+
+## 下一步
+
+这就是目前的所有内容。:D 请留意我们页面上的更新，我们将继续添加更多示例和文档。

@@ -1,0 +1,266 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 文件上传
+
+蝙蝠侠学会了如何使用 Robyn 实现文件上传功能，并创建了一个接口来处理文件上传。具体代码如下：
+
+## 上传不带 MultiPart 表单数据的文件
+
+<Row>
+<Col>
+为了提升性能，蝙蝠侠将应用程序扩展到了多个 CPU 核心。他使用以下代码处理文件上传：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.post("/upload")
+    async def upload():
+      body = request.body
+      file = bytearray(body)
+
+      # write whatever filename
+      with open('test.txt', 'wb') as f:
+          f.write(body)
+
+      return {'message': 'success'}
+    ```
+    ```python {{ title: 'typed' }}
+    @app.post("/upload")
+    async def upload():
+      body = request.body
+      file = bytearray(body)
+
+      # write whatever filename
+      with open('test.txt', 'wb') as f:
+          f.write(file)
+
+      return {'message': 'success'}
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 上传带 MultiPart 表单数据的文件
+
+<Row>
+<Col>
+为了进一步提升性能，蝙蝠侠继续扩展应用至多个内核，并使用以下代码处理带 MultiPart 表单数据的文件上传：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+
+    @app.post("/sync/multipart-file")
+    def sync_multipart_file(request: Request):
+        files = request.files
+        file_names = files.keys()
+        return {"file_names": list(file_names)}
+    ```
+    ```python {{ title: 'typed' }}
+
+    @app.post("/sync/multipart-file")
+    def sync_multipart_file(request: Request):
+        files = request.files
+        file_names = files.keys()
+        return {"file_names": list(file_names)}
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 文件下载
+
+蝙蝠侠希望让用户能够从 Web 应用中下载文件。他创建了一个接口来处理文件下载，具体代码如下：
+
+### 返回简单的 HTML 文件
+
+<Row>
+<Col>
+为提升应用性能，蝙蝠侠将应用扩展到多个核心，并使用以下命令提供简单的 HTML 文件：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn, serve_html
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request):
+        return serve_html("./index.html")
+
+    app.start(port=8080)
+
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import Robyn, Request, serve_html
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request: Request):
+        return serve_html("./index.html")
+
+    app.start(port=8080)
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 返回简单的 HTML 字符串
+
+<Row>
+<Col>
+除了 HTML 文件，蝙蝠侠还希望提供简单的 HTML 字符串。为此，他使用了以下代码：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn, html
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request):
+        html_string = "<h1>Hello World</h1>"
+        return html(html_string)
+
+    app.start(port=8080)
+
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import Robyn, Request, html
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request: Request):
+        html_string = "<h1>Hello World</h1>"
+        return html(html_string)
+
+    app.start(port=8080)
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 返回其他类型的文件
+
+<Row>
+<Col>
+在成功提供 HTML 文件后，蝙蝠侠还希望能够提供其他类型的文件，如 CSS、JS 和图片。为此，他使用了以下代码：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn, serve_file
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request):
+        return serve_file("./index.html", file_name="index.html") # file_name is optional
+
+    app.start(port=8080)
+
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import Robyn, serve_file, Request
+
+    app = Robyn(__file__)
+
+
+    @app.get("/")
+    async def h(request: Request):
+        return serve_file("./index.html", file_name="index.html") # file_name is optional
+
+    app.start(port=8080)
+
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 返回文件目录
+
+<Row>
+<Col>
+在能够提供其他类型的文件后，蝙蝠侠希望能够提供文件目录，例如用于提供 React 构建目录或简单的 HTML/CSS/JS 目录。为此，他使用了以下代码：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn, serve_file
+
+    app = Robyn(__file__)
+
+
+    app.serve_directory(
+        route="/test_dir",
+        directory_path=os.path.join(current_file_path, "build"),
+        index_file="index.html",
+    )
+
+    app.start(port=8080)
+
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import Robyn, serve_file, Request
+
+    app = Robyn(__file__)
+
+
+    app.serve_directory(
+        route="/test_dir",
+        directory_path=os.path.join(current_file_path, "build"),
+        index_file="index.html",
+    )
+
+    app.start(port=8080)
+
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 下一步
+
+现在，蝙蝠侠准备好深入了解 Robyn 的高级功能。现在，他非常好奇如何处理表单数据。
+
+- [表单处理](/documentation/zh/api_reference/form_data)

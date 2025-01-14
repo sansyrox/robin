@@ -1,0 +1,138 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 模板
+
+蝙蝠侠希望能在网站上快速渲染 HTML 页面，并打算使用模板引擎来实现这一目标。Robyn 告诉他可以使用 Jinja2 模板引擎，并通过 JinjaTemplate 类来渲染 HTML 页面。
+
+<Row>
+<Col>
+了解一番后，蝙蝠侠很高兴地发现，他还可以将事件作为函数和装饰器进行添加。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{title: 'untyped'}}
+    from robyn.templating import JinjaTemplate
+
+    current_file_path = pathlib.Path(__file__).parent.resolve()
+    JINJA_TEMPLATE = JinjaTemplate(os.path.join(current_file_path, "templates"))
+
+    @app.get("/template_render")
+    def template_render():
+        context = {"framework": "Robyn", "templating_engine": "Jinja2"}
+
+        template = JINJA_TEMPLATE.render_template(template_name="test.html", **context)
+        return template
+
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn.templating import JinjaTemplate
+
+    current_file_path = pathlib.Path(__file__).parent.resolve()
+    JINJA_TEMPLATE = JinjaTemplate(os.path.join(current_file_path, "templates"))
+
+    @app.get("/template_render")
+    def template_render():
+        context = {"framework": "Robyn", "templating_engine": "Jinja2"}
+
+        template = JINJA_TEMPLATE.render_template(template_name="test.html", **context)
+        return template
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+<Row>
+
+  <Col>
+  `test.html` 文件
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```html
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <title>Results</title>
+        </head>
+
+        <body>
+         Hello {{ framework }}! You're using {{ templating_engine }}.
+        </body>
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 自定义模板引擎
+
+蝙蝠侠还发现，Robyn 允许支持自定义模板引擎。
+
+<Row>
+<Col>
+为此，您需要从 `robyn.templating` 导入 `TemplateInterface`：
+</Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      from robyn.templating import TemplateInterface
+      ```
+
+      ```python {{ title: 'typed' }}
+      from robyn.templating import TemplateInterface
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+然后，在您的项目中定义 `render_template` 方法。以下是一个自定义模板引擎的实现示例：
+</Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      class JinjaTemplate(TemplateInterface):
+        def __init__(self, directory, encoding="utf-8", followlinks=False):
+            self.env = Environment(
+                loader=FileSystemLoader(
+                    searchpath=directory, encoding=encoding, followlinks=followlinks
+                )
+            )
+
+        def render_template(self, template_name, **kwargs):
+            return self.env.get_template(template_name).render(**kwargs)
+      ```
+
+      ```python {{ title: 'typed' }}
+      class JinjaTemplate(TemplateInterface):
+        def __init__(self, directory, encoding="utf-8", followlinks=False):
+            self.env = Environment(
+                loader=FileSystemLoader(
+                    searchpath=directory, encoding=encoding, followlinks=followlinks
+                )
+            )
+
+        def render_template(self, template_name: str, **kwargs):
+            return self.env.get_template(template_name).render(**kwargs)
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 下一步
+
+在掌握了模板引擎的使用后，蝙蝠侠还希望能够在应用中实现路由重定向功能。
+
+- [重定向](/documentation/zh/api_reference/redirection)

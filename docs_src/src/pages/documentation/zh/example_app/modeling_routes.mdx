@@ -1,0 +1,155 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 数据模型和数据库连接
+
+蝙蝠侠设计了一个数据模型，用于表示犯罪数据，包括罪行类型、嫌疑人及其位置等信息。他选择使用 SQLite 数据库来存储数据，并通过 ORM（对象关系映射）库与数据库进行交互。
+
+```python
+# models.py
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+DATABASE_URL = "sqlite:///./gotham_crime_data.db"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+Base = declarative_base()
+
+class Crime(Base):
+    __tablename__ = "crimes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, index=True)
+    description = Column(String)
+    location = Column(String)
+    suspect_name = Column(String)
+    date_time = Column(DateTime)
+    latitude = Column(Float)
+    longitude = Column(Float)
+
+```
+
+## 配置 Robyn 应用
+
+蝙蝠侠成功创建了一个 Robyn 应用，并将其配置为使用数据库会话来访问 SQLite 数据库。
+
+根据数据库模型，蝙蝠侠实现了一些辅助方法来与数据库进行交互。这些方法将用于在应用的 API 接口中执行 CRUD（增删改查）操作。
+
+```python {{ title: 'crud.py' }}
+# crud.py
+from sqlalchemy.orm import Session
+from .models import  Crime
+
+
+def get_crime(db: Session, crime_id: int):
+    return db.query(Crime).filter(Crime.id == crime_id).first()
+
+def get_crimes(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Crime).offset(skip).limit(limit).all()
+
+def create_crime(db: Session, crime):
+    db_crime = Crime(**crime)
+    db.add(db_crime)
+    db.commit()
+    db.refresh(db_crime)
+    return db_crime
+
+def update_crime(db: Session, crime_id: int, crime):
+    db_crime = get_crime(db, crime_id)
+    if db_crime is None:
+        return None
+    for key, value in crime.items():
+        setattr(db_crime, key, value)
+    db.commit()
+    db.refresh(db_crime)
+    return db_crime
+
+def delete_crime(db: Session, crime_id: int):
+    db_crime = get_crime(db, crime_id)
+    if db_crime is None:
+        return False
+    db.delete(db_crime)
+    db.commit()
+    return True
+
+```
+
+## 犯罪数据 API 接口
+
+蝙蝠侠为管理犯罪数据创建了多个 API 接口。这些接口允许哥谭市警察局添加、更新和查询犯罪记录。
+
+```python {{ title: 'Setting up Routes' }}
+# __main__.py
+from robyn import Robyn
+from robyn.robyn import Request, Response
+from sqlalchemy.orm import Session
+
+app = Robyn(__file__)
+
+@app.post("/crimes")
+async def add_crime(request):
+    with SessionLocal() as db:
+        crime = request.json()
+        insertion = crud.create_crime(db, crime)
+
+    if insertion is None:
+        raise Exception("Crime not added")
+
+    return {
+        "description": "Crime added successfully",
+        "status_code": 200,
+    }
+
+@app.get("/crimes")
+async def get_crimes(request):
+    with SessionLocal() as db:
+        skip = request.query_params.get("skip", "0")
+        limit = request.query_params.get("limit", "100")
+        crimes = crud.get_crimes(db, skip=skip, limit=limit)
+
+    return crimes
+
+@app.get("/crimes/:crime_id", auth_required=True)
+async def get_crime(request):
+    crime_id = int(request.path_params.get("crime_id"))
+    with SessionLocal() as db:
+        crime = crud.get_crime(db, crime_id=crime_id)
+
+    if crime is None:
+        raise Exception("Crime not found")
+
+    return crime
+
+@app.put("/crimes/:crime_id")
+async def update_crime(request):
+    crime = request.json()
+    crime_id = int(request.path_params.get("crime_id"))
+    with SessionLocal() as db:
+        updated_crime = crud.update_crime(db, crime_id=crime_id, crime=crime)
+    if updated_crime is None:
+        raise Exception("Crime not found")
+    return updated_crime
+
+@app.delete("/crimes/{crime_id}")
+async def delete_crime(request):
+    crime_id = int(request.path_params.get("crime_id"))
+    with SessionLocal() as db:
+        success = crud.delete_crime(db, crime_id=crime_id)
+    if not success:
+        raise Exception("Crime not found")
+    return {"message": "Crime deleted successfully"}
+
+
+```
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/authentication"
+    variant="text"
+    arrow="right"
+    children="下一步: 身份验证"
+  />
+</div>

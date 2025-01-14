@@ -1,0 +1,34 @@
+## 自定义异常处理
+
+蝙蝠侠学习了如何在应用程序中为不同类型的异常创建自定义处理程序。他实现了以下代码来捕获异常并返回自定义的错误响应：
+
+<Row>
+<Col>
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.exception
+    def handle_exception(error):
+        return Response(status_code=500, description=f"error msg: {error}", headers={})
+    ```
+
+    ```python {{ title: 'typed' }}
+    @app.exception
+    def handle_exception(error: Exception):
+        return Response(status_code=500, description=f"error msg: {error}", headers={})
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 下一步
+
+现在，蝙蝠侠希望进一步提升 Web 应用的性能。Robyn 随即为他介绍了多核扩展的概念。
+
+- [多核扩展](/documentation/zh/api_reference/scaling)

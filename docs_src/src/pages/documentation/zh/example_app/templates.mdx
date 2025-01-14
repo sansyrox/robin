@@ -1,0 +1,64 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 模板
+
+在完成后端开发后，蝙蝠侠决定为他的应用程序添加前端。他希望创建一个简单的网页来展示他收集的数据，同时也希望能够将新数据添加到数据库，并编辑现有的数据。
+
+这时，他接触到了模板！
+
+模板是 Robyn 框架中的一项强大功能，允许开发者使用 HTML 和 Python 创建动态网页。通过模板，您可以方便地为应用程序添加前端，而无需学习新的语言或框架。
+
+Robyn 默认支持 Jinja2 模板引擎，并且提供了简单的方式来集成其他模板引擎。
+
+### 创建模板
+
+要创建模板，您需要在项目目录中创建一个扩展名为 `.html` 的文件。通常情况下，这些模板文件会存放在名为 `templates` 的目录下。例如，如果您想创建一个名为 `index.html` 的模板，您可以在 `templates` 目录中创建该文件。
+
+因此，您的文件夹结构可能如下所示：
+
+```bash
+├── app.py
+├── templates
+│   └── index.html
+├── Dockerfile
+└── requirements.txt
+
+```
+
+### 模板渲染
+
+创建好模板后，您可以使用 `render_template` 函数来渲染它。该函数的第一个参数是模板的名称，第二个参数是一个字典，其中包含要传递给模板的变量。
+
+例如，要渲染 `index.html` 模板，可以使用如下代码：
+
+```python {{ title: '模板渲染' }}
+
+import os
+import pathlib
+from robyn.templating import JinjaTemplate
+
+
+current_file_path = pathlib.Path(__file__).parent.resolve()
+jinja_template = JinjaTemplate(os.path.join(current_file_path, "templates"))
+
+@app.get("/frontend")
+async def get_frontend(request):
+    context = {"framework": "Robyn", "templating_engine": "Jinja2"}
+    return jinja_template.render_template("index.html", **context)
+
+app.include_router(frontend)
+```
+
+现在，蝙蝠侠的应用程序已经成功完成，前端页面也正常显示。然而，蝙蝠侠对当前的代码结构并不满意。他认为所有的代码都集中在一个文件中，难以维护。于是，他询问 Robyn 是否有办法将代码拆分成多个模块。
+
+这时，Robyn 向蝙蝠侠介绍了路由器和视图的概念。
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/subrouters_and_views"
+    variant="text"
+    arrow="right"
+    children="子路由器和视图"
+  />
+</div>

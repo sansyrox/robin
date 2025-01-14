@@ -1,0 +1,102 @@
+export const description =
+  '在此页面中，我们将了解如何在不同的云提供商上部署 Robyn。'
+
+在各种云提供商上托管 Robyn 应用程序的服务。
+
+## Railway
+
+这里，我们将在 `Railway` 上部署应用程序。
+
+但是，在部署之前，我们需要一个 GitHub 账户作为必备条件。
+
+我们将部署一个示例的 "Hello World"，演示一个简单的 GET 路由并提供一个 HTML 文件。
+
+Directory structure:
+
+  <CodeGroup>
+
+```bash
+app folder/
+  main.py
+  requirements.txt
+  index.html
+```
+
+  </CodeGroup>
+
+注意：Railway 会寻找 `main.py` 作为入口点，而不是 `app.py`。如果没有 `main.py` 文件，构建过程将失败。
+
+  <CodeGroup title="main.py">
+
+```python {{ title: 'python' }}
+from robyn import Robyn, serve_html
+
+
+app = Robyn(__file__)
+
+
+@app.get("/hello")
+async def h(request):
+    print(request)
+    return "Hello, world!"
+
+
+@app.get("/")
+async def get_page(request):
+    return serve_html("./index.html")
+
+
+if __name__ == "__main__":
+    app.start(url="0.0.0.0", port=PORT)
+```
+
+  </CodeGroup>
+
+  <CodeGroup title="index.html">
+
+    ```python {{ title: 'python' }}
+    <h1> Hello World, this is Robyn framework! <h1>
+    ```
+
+  </CodeGroup>
+
+## 开放端口
+
+Railway 的文档中讲解了如何监听端口：
+
+> 启动应用程序的最简单方法是让应用程序监听 `0.0.0.0:$PORT`，其中 `PORT` 是 Railway 提供的环境变量。
+
+因此，必须将主机设置为 `0.0.0.0`，并将其作为参数传递给 `app.start()`。
+
+我们需要创建一个 Railway 账户来在 Railway 上部署该应用。可以通过访问 `Railway 首页` 来完成。
+
+点击 "登录" 按钮并选择 "使用 GitHub 账户登录"。
+
+<img src="https://user-images.githubusercontent.com/70811425/202867604-10a09f87-ecb9-4a42-ae90-1359223049bc.png" />
+
+接下来，点击 "新项目" 按钮，并选择 "从 GitHub 仓库部署"。
+
+<img src="https://user-images.githubusercontent.com/70811425/202870632-4d3f46dc-1aa9-4603-9b0f-344ed87ec9d0.png" />
+
+然后选择我们想要部署的仓库，并点击 "立即部署"。
+
+<img src="https://user-images.githubusercontent.com/70811425/202870837-16884fef-8900-4ab3-9794-0fb53c3ffd2e.png" />
+<img src="https://user-images.githubusercontent.com/70811425/202871003-f79a1cef-9a5f-4166-be4f-527c60ec6c79.png" />
+
+现在，点击我们项目。
+
+选择 "变量" 并点击 "新变量" 按钮设置环境变量。
+
+<img src="https://user-images.githubusercontent.com/70811425/202870681-5c069475-a5d1-4069-8582-c5b549d27aad.png" />
+
+接着，进入 "设置" 标签页，点击 "生成域名"。
+
+我们可以在 "域名" 标签页下生成一个临时域名。
+
+<img src="https://user-images.githubusercontent.com/70811425/202870735-6b955752-c5a6-48d5-acbc-1a4ea6fd7574.png" />
+
+我们可以访问 `<domain>/hello` 来确认 "Hello World" 消息是否正确显示。
+
+## 下一步
+
+- [未来发展路线图](/documentation/zh/api_reference/future-roadmap)

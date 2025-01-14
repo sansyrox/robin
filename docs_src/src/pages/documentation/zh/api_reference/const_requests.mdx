@@ -1,0 +1,75 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+实现身份验证后，蝙蝠侠担心在高峰时段，尤其是小丑企图释放阿卡姆疯人院所有罪犯时，可能会引发大量请求，导致服务器崩溃。为此，Robyn 向他介绍了常量请求和多核扩展功能，以增强应用程序的性能。
+
+## 常量请求
+
+Robyn 告诉蝙蝠侠，可以为每个路由预处理响应，这样即使在路由处理之前，响应就已准备好。这样做可以减少访问路由器的次数，从而提高响应速度。
+
+<Row>
+<Col>
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      @app.get("/", const=True)
+      async def h():
+          return "Hello, world"
+      ```
+
+      ```python {{title: 'typed'}}
+      @app.get("/", const=True)
+      async def h():
+          return "Hello, world"
+
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 多核扩展
+
+Robyn 告诉蝙蝠侠，可以使用 `--workers` 参数将应用程序扩展到多个核心。这样，系统会创建多个应用实例并分配负载，从而提升性能。
+
+<Row>
+
+  <Col>
+
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request">
+
+      ```python {{ title: 'untyped' }}
+      python3 app.py --workers=N --process=M
+      ```
+
+      ```python {{title: 'typed'}}
+      python3 app.py --workers=N --process=M
+      ```
+    </CodeGroup>
+
+  </Col>
+
+`authenticate` 方法应在用户通过身份验证时返回 `Identity` 对象，否则返回 `None`。`Identity` 对象可以包含任意数据，并可以通过 `request.identity` 属性在路由方法中访问。
+
+<b>
+  注意：该身份验证系统在底层主要通过 `before request`
+  中间件实现。您可以忽略此机制，使用自定义中间件实现自己的身份验证系统。然而，Robyn
+  提供的这一简单易用的解决方案已能满足大多数应用场景的需求。
+</b>
+
+</Row>
+
+---
+
+## 下一步
+
+在提升了应用程序的性能后，蝙蝠侠非常高兴，并希望应用也可以接收从前端项目中发出请求。
+
+然而，这是他却遇到了 CORS（跨源资源共享）问题！于是，他向 Robyn 咨询如何解决这个问题。Robyn 向他介绍了相关的功能：
+
+- [跨域资源共享](/documentation/zh/api_reference/cors)

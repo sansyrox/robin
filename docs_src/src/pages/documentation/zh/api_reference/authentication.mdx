@@ -1,0 +1,89 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+创建应用程序的基本版本后，蝙蝠侠希望限制哥谭警察局的访问权限。因此，他询问了 Robyn 提供的身份验证功能。
+
+## 身份验证
+
+正如蝙蝠侠发现的那样，Robyn 提供了一种简便的方法，允许将身份验证中间件添加到应用程序中。通过在路由中指定 `auth_required=True`，可以确保该路由仅对已验证的用户开放。
+
+<Row>
+<Col>
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/auth", auth_required=True)
+    async def auth(request: Request):
+        # This route method will only be executed if the user is authenticated
+        # Otherwise, a 401 response will be returned
+        return "Hello, world"
+    ```
+
+    ```python {{title: 'typed'}}
+    @app.get("/auth", auth_required=True)
+    async def auth(request: Request):
+        # This route method will only be executed if the user is authenticated
+        # Otherwise, a 401 response will be returned
+        return "Hello, world"
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+<Row>
+
+  <Col>
+  要添加身份验证中间件，您可以使用 `configure_authentication` 方法。此方法需要一个 `AuthenticationHandler` 对象作为参数。该对象定义了如何进行用户身份验证，并使用 `TokenGetter` 对象从请求中提取令牌。Robyn 目前提供了一个 `BearerGetter` 类，它使用 `Bearer` 认证方案从 `Authorization` 请求头中获取令牌。以下是一个基本身份验证处理程序的示例：
+
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      class BasicAuthHandler(AuthenticationHandler):
+        def authenticate(self, request: Request) -> Optional[Identity]:
+            token = self.token_getter.get_token(request)
+            if token == "valid":
+                return Identity(claims={})
+            return None
+
+      app.configure_authentication(BasicAuthHandler(token_getter=BearerGetter()))
+
+      ```
+
+      ```python {{title: 'typed'}}
+      class BasicAuthHandler(AuthenticationHandler):
+        def authenticate(self, request: Request) -> Optional[Identity]:
+            token = self.token_getter.get_token(request)
+            if token == "valid":
+                return Identity(claims={})
+            return None
+
+      app.configure_authentication(BasicAuthHandler(token_getter=BearerGetter()))
+
+      ```
+    </CodeGroup>
+
+  </Col>
+
+`authenticate` 方法应在用户通过身份验证时返回 `Identity` 对象，否则返回 `None`。`Identity` 对象可以包含任意数据，并可以通过 `request.identity` 属性在路由方法中访问。
+
+<b>
+  注意：该身份验证系统在底层主要通过 `before request`
+  中间件实现。您可以忽略此机制，使用自定义中间件实现自己的身份验证系统。然而，Robyn
+  提供的这一简单易用的解决方案已能满足大多数应用场景的需求。
+</b>
+
+</Row>
+
+---
+
+## 下一步
+
+蝙蝠侠已经掌握了身份验证的基本知识，接下来他希望了解一些优化技术，以提升应用程序的性能。他发现了以下功能：
+
+- [常量请求与多核扩展](/documentation/zh/api_reference/const_requests)

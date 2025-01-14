@@ -1,0 +1,783 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+## 同步与异步请求
+
+首先，Robyn 向蝙蝠侠介绍了它处理同步和异步请求的能力。蝙蝠侠很高兴了解这些功能，并开始在应用中实现它们。
+
+<Row>
+<Col>
+对于一个简单的同步请求，蝙蝠侠使用以下代码：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import Robyn
+
+    app = Robyn(__file__)
+
+    @app.get("/")
+    def h(request):
+        return "Hello, world"
+
+    app.start(port=8080, host="0.0.0.0") # host 是可选的，默认为 127.0.0.1
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Robyn, Request
+
+    app = Robyn(__file__)
+
+    @app.get("/")
+    def h(request: Request):
+        return "Hello, world"
+
+    app.start(port=8080, host="0.0.0.0")
+
+
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+<Row>
+
+  <Col>
+    对于异步请求，蝙蝠侠使用了以下代码：
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      @app.get("/")
+      async def h(request):
+          return "Hello, world"
+
+      ```
+
+      ```python {{title: 'typed'}}
+      from robyn import Request
+
+      @app.get("/")
+      async def h(request: Request) -> str:
+          return "Hello, world"
+
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 运行 Robyn
+
+蝙蝠侠对如何运行该应用程序感到好奇。Robyn 解释说，他可以通过一个简单的命令 `python3 app.py` 来运行应用程序 `app.py`。
+
+<Row>
+  <Col>
+    Robyn 公开如下命令。这些命令可用于运行应用程序或生成新项目。
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+      ```bash
+      usage: app.py [-h] [--processes PROCESSES] [--workers WORKERS] [--log-level LOG_LEVEL] [--create] [--docs] [--open-browser] [--version]
+
+      Robyn，一个快速的异步 web 框架，基于 Rust 运行。
+
+      选项:
+        -h, --help            显示帮助信息并退出
+        --processes PROCESSES
+                              选择进程的数量。[默认值: 1]
+        --workers WORKERS     选择工作线程的数量。[默认值: 1]
+        --dev                 开发者模式。它会根据文件更改重新启动服务器。
+        --log-level LOG_LEVEL
+                              设置日志级别
+        --create              创建一个新的项目模板。
+        --docs                打开 Robyn 文档。
+        --open-browser        启动成功后打开浏览器。
+        --version             显示 Robyn 的版本。
+        --compile-rust-path COMPILE_RUST_PATH
+                              编译指定路径下的 Rust 文件。
+        --create-rust-file CREATE_RUST_FILE
+                              创建一个指定名称的 Rust 文件。
+        --disable-openapi     禁用 OpenAPI 文档。
+        --fast                快速模式。它设置进程、工作线程和日志级别的最佳值。不过，您可以覆盖这些设置。
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row />
+
+<Row>
+  <Col>
+    另外，您还可以使用 Robyn 的 CLI 来运行应用程序，即 `python -m robyn app.py`。
+  </Col>
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+      ```bash
+
+      usage: python -m robyn app.py [-h] [--processes PROCESSES] [--workers WORKERS] [--dev] [--log-level LOG_LEVEL] [--create] [--docs] [--open-browser] [--version]
+
+
+      Robyn，一个快速的异步 web 框架，基于 Rust 运行。
+
+      选项:
+        -h, --help            显示帮助信息并退出
+        --processes PROCESSES
+                              选择进程的数量。[默认值: 1]
+        --workers WORKERS     选择工作线程的数量。[默认值: 1]
+        --dev                 开发者模式。它会根据文件更改重新启动服务器。
+        --log-level LOG_LEVEL
+                              设置日志级别
+        --create              创建一个新的项目模板。
+        --docs                打开 Robyn 文档。
+        --open-browser        启动成功后打开浏览器。
+        --version             显示 Robyn 的版本。
+        --compile-rust-path COMPILE_RUST_PATH
+                              编译指定路径下的 Rust 文件。
+        --create-rust-file CREATE_RUST_FILE
+                              创建一个指定名称的 Rust 文件。
+        --disable-openapi     禁用 OpenAPI 文档。
+        --fast                快速模式。它设置进程、工作线程和日志级别的最佳值。不过，您可以覆盖这些设置。
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 处理 HTTP 请求
+
+然后，Robyn 教蝙蝠侠如何处理各种 HTTP 请求，如 GET、POST、PUT、PATCH 和 DELETE。在 Robyn 的指导下，蝙蝠侠可以为每种请求类型创建接口，从而使应用程序更加灵活和高效。
+
+<Row>
+<Col>
+例如，蝙蝠侠学会了创建如下 POST 请求：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.post("/")
+    async def h(request):
+        return "Hello World"
+
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request
+
+    @app.post("/")
+    async def h(request: Request):
+        return "Hello World"
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 响应 JSON 数据
+
+蝙蝠侠对从应用程序返回 JSON 响应的能力感到好奇。Robyn 向他展示了如何使用 `jsonify` 函数来实现这一点。
+
+<Row>
+<Col>
+  现在，蝙蝠侠可以从应用程序返回 JSON 响应，从而方便前端解析数据。
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import jsonify
+
+    @app.post("/jsonify")
+    async def json(request):
+        return {"hello": "world"}
+
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import jsonify, Request
+
+
+    @app.post("/jsonify")
+    async def json(request: Request):
+        return {"hello": "world"}
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 获取路径参数与查询参数
+
+蝙蝠侠想了解如何从传入的请求中访问路径参数和查询参数，这样他就能创建动态路由，并从请求中提取特定信息。
+
+<Row>
+  <Col>
+
+Robyn 向蝙蝠侠展示了如何从请求中访问路径参数和查询参数。以下是相关的示例：
+
+例如，蝙蝠侠可以创建带路径参数的路由，并通过以下代码访问该参数：
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/http_requests">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import jsonify
+
+    @app.post("/jsonify/:id")
+    async def json(request, path_params):
+        print(request.path_params["id"])
+        print(path_params["id"])
+        assert request.path_params["id"] == path_params["id"]
+        return {"hello": "world"}
+
+
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import jsonify
+    from robyn.types import PathParams
+
+    @app.post("/jsonify/:id")
+    async def json(req_obj: Request, path_parameters: PathParams):
+        print(req_obj.path_params["id"])
+        print(path_params["id"])
+        assert req_obj.path_params["id"] == path_parameters["id"]
+        return {"hello": "world"}
+
+    ```
+
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+  <Col>
+
+要访问查询参数，蝙蝠侠可以使用以下代码：
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="POST" label="/http_requests">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/query")
+    async def query_get(request, query_params):
+        query_data = query_params.to_dict()
+        assert query_data == request.query_params.to_dict()
+        return jsonify(query_data)
+    ```
+
+    ```python {{ title: 'typed' }}
+    from robyn import Request
+    from robyn.robyn import QueryParams
+
+    @app.get("/query")
+    async def query_get(req_obj: Request, query_params: QueryParams):
+        query_data = query_params.to_dict()
+        assert query_data == req_obj.query_params.to_dict()
+        return jsonify(query_data)
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+  <Col>
+
+任何请求参数都可以在处理程序函数中通过类型注释或使用保留名称进行访问。
+
+{' '}
+
+<b>请注意，类型注释会优先于保留名称。</b>
+Robyn 向蝙蝠侠演示了访问请求参数的不同语法示例：
+
+  </Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/split_request_params">
+
+    ```python
+    from robyn.robyn import QueryParams, Headers
+    from robyn.types import PathParams, RequestMethod, RequestBody, RequestURL
+
+    @app.get("/untyped/query_params")
+    def untyped_basic(query_params):
+        return query_params.to_dict()
+
+
+    @app.get("/typed/query_params")
+    def typed_basic(query_data: QueryParams):
+        return query_data.to_dict()
+
+
+    @app.get("/untyped/path_params/:id")
+    def untyped_path_params(query_params: PathParams):
+        return query_params  # 由于类型注释优先，PathParams 包含路径参数
+
+
+    @app.post("/typed_untyped/combined")
+    def typed_untyped_combined(
+            query_params,
+            method_data: RequestMethod,
+            body_data: RequestBody,
+            url: RequestURL,
+            headers_item: Headers,
+    ):
+        return {
+            "body": body_data,
+            "query_params": query_params.to_dict(),
+            "method": method_data,
+            "url": url.path,
+            "headers": headers_item.get("server"),
+        }
+    ```
+
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+类型别名: `Request`、`QueryParams`、`Headers`、`PathParams`、`RequestBody`、`RequestURL`、`FormData`、`RequestFiles`、`RequestIP`、`RequestIdentity`
+
+保留名称: `r`、`req`、`request`、`query_params`、`headers`、`path_params`、`body、method`、`url`、`ip_addr`、`identity`、`form_data`、`files`
+
+---
+
+随着蝙蝠侠继续使用 Robyn 开发 Web 应用，他探索了更多功能，并通过代码示例实现它们。
+
+## 自定义响应格式与响应头
+
+在了解了 Robyn 的动态特性后，蝙蝠侠想要自定义响应格式和响应头。Robyn 向他展示了如何使用字典和 `Response` 对象来实现这一功能。
+
+### 使用字典
+
+<Row>
+<Col>
+蝙蝠侠学会了通过返回字典或使用 Robyn 的 `Response` 对象来定制响应格式，并为每个响应设置状态码和响应头。下面是一个使用字典创建响应的示例：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.post("/dictionary")
+    async def dictionary(request):
+        return {
+            "status_code": 200,
+            "description": "This is a regular response",
+            "type": "text",
+            "headers": {"Header": "header_value"},
+        }
+
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request
+
+    @app.post("/dictionary")
+    async def dictionary(request: Request):
+        return {
+            "status_code": 200,
+            "description": "This is a regular response",
+            "type": "text",
+            "headers": {"Header": "header_value"},
+        }
+
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 使用 Response 对象
+
+<Row>
+<Col>
+蝙蝠侠还学会了如何使用 `Response` 对象，示例如下：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn.robyn import Response
+
+    @app.get("/response")
+    async def response(request):
+        return Response(status_code=200, headers=Headers({}), description="OK")
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn.robyn import Response, Request
+
+    @app.get("/response")
+    async def response(request: Request):
+        return Response(status_code=200, headers=Headers({}), description="OK")
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 返回二进制输出
+
+<Row>
+<Col>
+蝙蝠侠还希望从应用程序返回二进制数据。他可以通过将响应类型设置为 binary 并返回一个字节对象来实现：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/binary_output_response_sync")
+    def binary_output_response_sync(request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+
+
+    @app.get("/binary_output_async")
+    async def binary_output_async(request):
+        return b"OK"
+
+
+    @app.get("/binary_output_response_async")
+    async def binary_output_response_async(request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request, Response
+
+    @app.get("/binary_output_response_sync")
+    def binary_output_response_sync(request: Request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+
+
+    @app.get("/binary_output_async")
+    async def binary_output_async(request: Request):
+        return b"OK"
+
+
+    @app.get("/binary_output_response_async")
+    async def binary_output_response_async(request: Request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 响应头
+
+作为世界上最伟大的侦探，蝙蝠侠在 `Response` 对象中发现了 `headers` 字段，他希望进一步了解如何使用它来设置响应头。例如，蝙蝠侠可以通过以下方式设置 `Content-Type` 响应头为 `application/json`：
+
+### 局部响应头
+
+<Row>
+<Col>
+通过使用 `Response` 对象中的 `headers` 字段：
+</Col>
+<Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/")
+    def binary_output_response_sync(request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request
+
+    @app.get("/")
+    def binary_output_response_sync(request: Request):
+        return Response(
+            status_code=200,
+            headers={"Content-Type": "application/octet-stream"},
+            description="OK",
+        )
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+### 全局响应头
+
+<Row>
+
+<Col>蝙蝠侠还可以为所有路由器设置全局响应头：</Col>
+
+  <Col>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    app.add_response_header("content-type", "application/json")
+    ```
+
+    ```python {{title: 'typed'}}
+    app.add_response_header("content-type", "application/json")
+    ```
+    </CodeGroup>
+
+  </Col>
+
+<Col>
+`add_response_header` 会将响应头附加到响应头列表中，而 `set_response_header` 会替换现有响应头（如果有的话）。
+</Col>
+<Col>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    app.set_response_header("content-type", "application/json")
+    ```
+
+    ```python {{title: 'typed'}}
+    app.set_response_header("content-type", "application/json")
+    ```
+    </CodeGroup>
+
+  </Col>
+  
+<Col>
+如果希望某些接口不使用响应头，可以使用 `exclude_response_headers_for` 函数。
+</Col>
+<Col>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    app.exclude_response_headers_for(["/login", "/signup"])
+    ```
+
+    ```python {{title: 'typed'}}
+    app.exclude_response_headers_for(["/login", "/signup"])
+    ```
+    </CodeGroup>
+
+</Col>
+</Row>
+
+### Cookies
+
+<Row>
+<Col>
+使用 `set_cookies` 功能设置 Cookies：
+</Col>
+<Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/")
+    def binary_output_response_sync(request):
+        response = Response(200, {'type': 'int'}, "desc")
+        response.set_cookie(key="fakesession", value="fake-cookie-session-value")
+        return response
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request
+
+    @app.get("/")
+    def binary_output_response_sync(request: Request):
+        response = Response(200, {'type': 'int'}, "desc")
+        response.set_cookie(key="fakesession", value="fake-cookie-session-value")
+        return response
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 请求头
+
+蝙蝠侠现在想了解如何读取请求头。Robyn 向他解释，他可以使用 `request.headers` 字段来读取响应头。例如，蝙蝠侠可以通过以下方式读取 `Content-Type` 请求头：
+
+### 局部请求头
+
+<Row>
+<Col>
+通过使用 `Request` 对象中的 `headers` 字段：
+</Col>
+<Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    @app.get("/")
+    def binary_output_response_sync(request):
+      headers = request.headers
+
+      print("These are the request headers: ", headers)
+      existing_header = headers.get("exisiting_header")
+      existing_header = headers.get("exisiting_header", "default_value")
+      exisiting_header = headers["exisiting_header"] # This syntax is also valid
+
+      headers.set("modified", "modified_value")
+      headers["new_header"] = "new_value" # This syntax is also valid
+
+      print("These are the modified request headers: ", headers)
+
+      return ""
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import Request
+
+    @app.get("/")
+    def binary_output_response_sync(request: Request):
+      headers = request.headers
+
+      print("These are the request headers: ", headers)
+      existing_header = headers.get("exisiting_header")
+      existing_header = headers.get("exisiting_header", "default_value")
+      exisiting_header = headers["exisiting_header"] # This syntax is also valid
+
+      headers.set("modified", "modified_value")
+      headers["new_header"] = "new_value" # This syntax is also valid
+
+      print("These are the modified request headers: ", headers)
+
+      return ""
+
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+或者使用全局请求头：
+</Col>
+<Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    app.add_request_header("server", "robyn")
+    ```
+
+    ```python {{title: 'typed'}}
+    app.add_request_header("server", "robyn")
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+<Col>
+`add_request_header` 会将请求头附加到请求头列表中，而 `set_request_header` 会替换现有请求头（如果有的话）。
+</Col>
+<Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    app.set_request_header("server", "robyn")
+    ```
+
+    ```python {{title: 'typed'}}
+    app.set_request_header("server", "robyn")
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 响应状态码
+
+<Row>
+<Col>
+了解了响应格式和响应头之后，蝙蝠侠学会了为他的响应设置状态码：
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    from robyn import status_codes
+
+    @app.get("/response")
+    async def response(request):
+        return Response(status_code=status_codes.HTTP_200_OK, headers=Headers({}), description="OK")
+    ```
+
+    ```python {{title: 'typed'}}
+    from robyn import status_codes, Request
+
+
+    @app.get("/response")
+    async def response(request: Request):
+        return Response(status_code=status_codes.HTTP_200_OK, headers=Headers({}), description="OK")
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 下一步
+
+接下来，蝙蝠侠想知道 Robyn 提到的 **`Request` 请求对象**是什么。Robyn 说：“下一部分。”
+
+- [请求对象](/documentation/zh/api_reference/request_object)
+
+蝙蝠侠也对 Robyn 的架构感兴趣。Robyn 继续说道：“下一部分。”
+
+- [架构](/documentation/zh/architecture)

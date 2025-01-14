@@ -1,0 +1,62 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+# 基于 Robyn 创建真正的 Web 应用
+
+蝙蝠侠的任务是开发一个 Web 应用，用于管理哥谭市的犯罪数据。该应用允许哥谭市警察局存储和检索有关犯罪活动、嫌疑人以及其位置的信息。为提高开发效率，蝙蝠侠决定使用 Robyn Web 框架来快速构建该应用。
+
+您可以通过[此链接](https://github.com/sparckles/example_robyn_app)获取该应用的源代码。
+
+## 安装 Robyn
+
+首先，需要安装 Robyn。蝙蝠侠创建了一个虚拟环境，并通过 pip 安装了 Robyn。
+
+```bash
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install robyn
+```
+
+## 创建 Robyn 应用
+
+蝙蝠侠决定使用 Robyn 框架创建应用，在他准备创建 `src/app.py` 文件时，有人提醒他，Robyn 自带了一个命令行工具 (CLI)，可以帮助快速创建应用。于是他运行了以下命令来创建一个新的 Robyn 应用。
+
+```bash
+$ python -m robyn --create
+```
+
+运行命令后，终端显示如下提示：
+
+```bash
+$ python3 -m robyn --create
+? Directory Path: .
+? Need Docker? (Y/N) Y
+? Please select project type (Mongo/Postgres/Sqlalchemy/Prisma):
+❯ No DB
+  Sqlite
+  Postgres
+  MongoDB
+  SqlAlchemy
+  Prisma
+```
+
+接下来，他配置了应用的选项，大多数问题都选择了默认设置。
+
+完成后，Robyn CLI 成功创建了一个应用，应用的目录结构如下：
+
+```bash
+
+├── src
+│   ├── app.py
+├── Dockerfile
+
+```
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/modeling_routes"
+    variant="text"
+    arrow="right"
+    children="路由建模"
+  />
+</div>

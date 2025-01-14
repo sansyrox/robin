@@ -1,0 +1,41 @@
+## 插件
+
+Robyn 是一个灵活且可扩展的 Web 框架，允许用户在其基础上拓展插件。
+Robyn 的插件可以增强和自定义框架的功能，以满足特定需求。以下是一些值得关注的插件，它们可以大大优化 Robyn 的项目：
+
+### 限流插件
+
+- 描述：此插件使您能够为 Robyn 应用程序的路由实现限流功能。它有助于防止滥用、暴力攻击，并确保资源的公平使用。
+- GitHub 仓库: [robyn-rate-limits](https://github.com/IdoKendo/robyn_rate_limits)
+- 安装:
+  `python -m pip install robyn-rate-limits`
+- 使用示例:
+
+```py
+from robyn import Robyn, Request
+from robyn_rate_limits import InMemoryStore
+from robyn_rate_limits import RateLimiter
+
+app = Robyn(__file__)
+limiter = RateLimiter(store=InMemoryStore, calls_limit=3, limit_ttl=100)
+
+@app.before_request()
+def middleware(request: Request):
+    return limiter.handle_request(app, request)
+
+@app.get("/")
+def h():
+    return "Hello, World!"
+
+app.start(port=8080)
+```
+
+在这个示例中，robyn-rate-limits 用于为特定路由设置每 100 秒最多允许 3 次请求的限流规则。如果客户端超过此限制，他们将收到 "请求过多" 的提示消息。
+
+该插件与 Robyn Web 框架无缝集成，通过防止单个客户端发起过多请求，增强了应用程序的安全性和稳定性。
+
+## 下一步
+
+在探索完插件后，蝙蝠侠希望了解社区的更多内容。所以，Robyn 带他去了一个新地方：
+
+- [未来发展路线图](/documentation/zh/api_reference/future-roadmap)

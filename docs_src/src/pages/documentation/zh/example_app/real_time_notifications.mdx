@@ -1,0 +1,55 @@
+export const description =
+  '欢迎阅读 Robyn API 文档。本文档旨在提供全面的指南和参考，帮助您快速上手 Robyn，并在使用过程中解决可能遇到的问题。'
+
+## 即时通讯
+
+蝙蝠侠决定使用 WebSockets 为哥谭市警察局的警官们实现实时通知功能，从而使他们能够即时接收关于犯罪活动的更新，并在发生新的犯罪报告时触发警报。
+
+```python {{ title: '设置身份验证中间件' }}
+from robyn import WebSocket
+
+websocket = WebSocket(app, "/notifications")
+
+@websocket.on("connect")
+async def notify_connect():
+    return "Connected to notifications"
+
+@websocket.on("message")
+async def notify_message(message):
+    return f"Received: {message}"
+
+@websocket.on("close")
+async def notify_close():
+    return "Disconnected from notifications"
+
+```
+
+## 高级搜索和过滤
+
+为了提高警察在搜寻特定犯罪或嫌疑人时的效率，蝙蝠侠为应用程序增加了高级搜索和过滤选项。他设计了一个新的接口，允许用户根据多个标准（如犯罪类型、日期、地点和案件状态）进行精确搜索。
+
+```python {{ title: '高级搜索和过滤' }}
+@app.get("/crimes/search")
+async def search_crimes(request):
+    crime_type = request.query_params.get("crime_type")
+    date = request.query_params.get("date")
+    location = request.query_params.get("location")
+    status = request.query_params.get("status")
+
+    crimes = crud.search_crimes(db, crime_type=crime_type, date=date, location=location, status=status)
+    return crimes
+
+```
+
+通过这些新功能，哥谭市警察局能够更高效地利用 Web 应用程序来跟踪犯罪活动，并合理调配资源。蝙蝠侠在 Robyn Web 框架上的努力显著提升了打击犯罪的能力，使哥谭市变得更加安全。
+
+尽管蝙蝠侠在当前任务中取得了显著成效，他仍意识到系统有改进空间。因此，他将继续总结经验，不断完善系统，同时专注于履行黑暗骑士的核心使命——保护哥谭市的安全。
+
+<div className="not-prose">
+  <Button
+    href="/documentation/zh/example_app/monitoring_and_logging"
+    variant="text"
+    arrow="right"
+    children="监控和日志"
+  />
+</div>

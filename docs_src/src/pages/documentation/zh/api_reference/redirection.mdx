@@ -1,0 +1,38 @@
+## 重定向
+
+蝙蝠侠希望能够将一些路由重定向到其他路由。Robyn 帮助他实现了这一功能，具体操作如下：
+
+<Row>
+  <Col>
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request">
+
+      ```python {{title: 'untyped'}}
+      from robyn import Robyn, Response
+      app = Robyn(__file__)
+
+      @app.get("/")
+      async def index():
+        return Response(
+          status_code=307,
+          description="",
+          headers={"Location": "landing"},
+        )
+
+      @app.get("/landing")
+      def landing():
+        return "hii!"
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 下一步
+
+实现路由重定向功能后，蝙蝠侠希望能够在出现新的反派时，将文件上传到服务器。Robyn 向他介绍了文件上传和表单处理的功能。
+
+- [文件上传](/documentation/zh/api_reference/file-uploads)

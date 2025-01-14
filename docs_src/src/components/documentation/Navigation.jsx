@@ -389,14 +389,14 @@ const navigationTitles = {
   },
   zh: {
     'Documentation': '文档',
-    'Example Application': '示例应用',
+    'Example Application': '应用示例',
     'API Reference': 'API 参考',
     'Community Resources': '社区资源',
     'Architecture': '架构',
-    'Framework Comparison': '框架对比',
+    'Framework Comparison': '性能对比',
     'Hosting': '托管',
     'Plugins': '插件',
-    'Future Roadmap': '未来路线图'
+    'Future Roadmap': '未来发展路线图'
   }
 }
 
@@ -445,11 +445,11 @@ const translations = {
   zh: {
     titles: navigationTitles.zh,
     links: {
-      'Getting Started': '开始使用',
+      'Getting Started': '开始',
       'Modeling Routes': '路由建模',
-      'Authentication and Authorization': '身份验证和授权',
-      'Middlewares': '中间件',
-      'Real Time Notifications': '实时通知',
+      'Authentication and Authorization': '身份验证',
+      'Middlewares': '身份验证中间件',
+      'Real Time Notifications': '即时通讯',
       'Monitoring and Logging': '监控和日志',
       'Deployment': '部署',
       'OpenAPI Documentation': 'OpenAPI 文档',
@@ -468,18 +468,18 @@ const translations = {
       'Form Data': '表单数据',
       'Websockets': 'WebSocket',
       'Exceptions': '异常处理',
-      'Scaling the Application': '应用程序扩展',
-      'Advanced Features': '高级功能',
+      'Scaling the Application': '多核扩展',
+      'Advanced Features': '高级特性',
       'Multiprocess Execution': '多进程执行',
       'Direct Rust Usage': '直接使用 Rust',
       'GraphQL Support': 'GraphQL 支持',
       'Dependency Injection': '依赖注入',
       'Talks': '演讲',
       'Blogs': '博客',
-      'Introduction': '介绍',
+      'Introduction': '引入',
       'Upcoming Features': '即将推出的功能',
       'Railway': 'Railway',
-      'Exposing Ports': '端口暴露'
+      'Exposing Ports': '开放端口'
     }
   }
 }

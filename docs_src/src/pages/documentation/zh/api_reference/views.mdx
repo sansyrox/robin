@@ -1,0 +1,181 @@
+export const description =
+  '在此页面中，我们将深入探讨如何通过不同的接口实现符合预期的交互。'
+
+随着代码库的不断扩展，蝙蝠侠希望找到一种更好的方式来组织代码。Robyn 告诉他，他有能力以更清晰的方式组织代码，并向他介绍了视图和子路由器的概念。
+
+## 视图 (Views)
+
+<Row>
+<Col>
+为了更好地组织代码，无论是按照职责分组还是进行代码拆分，蝙蝠侠都可以选择使用视图。
+
+简单来说，视图就是一个包含多个处理函数（闭包）的函数。例如：
+
+</Col>
+  <Col sticky>
+
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+    ```python {{ title: 'untyped' }}
+    def sample_view():
+      def get():
+          return "Hello, world!"
+
+      def post(request):
+          body = request.body
+          return Response({"status_code": 200, "description": body, "headers": {}})
+
+    ```
+
+    ```python {{title: 'typed'}}
+      from robyn import Request
+
+      def sample_view():
+        def get():
+            return "Hello, world!"
+
+        def post(request: Request):
+            body = request.body
+            return Response({"status_code": 200, "description": body, "headers": {}})
+    ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+上面的视图包含了处理 GET 和 POST 请求的两个闭包。
+
+您可以通过以下两种方式来提供视图：
+
+<Row>
+
+  <Col>
+  使用 `@app.view` 装饰器：
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      @app.view("/sync/view/decorator")
+      def sync_decorator_view():
+       def get():
+           return "Hello, world!"
+
+       def post(request):
+           body = request.body
+           return body
+
+      ```
+      ```python {{ title: 'typed' }}
+      from robyn import Request
+
+      @app.view("/sync/view/decorator")
+      def sync_decorator_view():
+       def get():
+           return "Hello, world!"
+
+       def post(request: Request):
+           body = request.body
+           return body
+
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+<Row>
+  <Col>
+  使用 `app.add_view` 方：
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+        from .views import sample_view
+
+        ...
+        ...
+
+        app.add_view("/", sample_view)
+      ```
+      ```python {{ title: 'typed' }}
+        from .views import sample_view
+
+        ...
+        ...
+
+        app.add_view("/", sample_view)
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+---
+
+## 子路由器 (Subrouters)
+
+<Row>
+
+  <Col>
+
+蝙蝠侠可以在 Robyn 项目中创建子路由器，用于将多个相关的路由分组在一起，方便管理和使用。
+
+子路由器不仅可以用来管理常规的 HTTP 路由，还可以用来管理 Web 套接字（web sockets）路由。换句话说，子路由器的功能与主路由器类似，它可以被视作是主路由器的一个简化版。
+
+有一点需要注意的是，子路由器必须添加到主路由器中。
+
+  </Col>
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/hello_world">
+
+      ```python {{ title: 'untyped' }}
+      from robyn import Robyn, SubRouter
+
+      app = Robyn(__file__)
+
+      sub_router = SubRouter("/sub_router")
+
+      @sub_router.get("/hello")
+      def hello():
+          return "Hello, world"
+
+      web_socket = SubRouter("/web_socket")
+
+      @web_socket.message()
+      async def hello():
+          return "Hello, world"
+
+      app.include_router(sub_router)
+      ```
+
+
+      ```python {{ title: 'typed' }}
+      from robyn import Robyn, SubRouter
+
+      app = Robyn(__file__)
+
+      sub_router = SubRouter("/sub_router")
+
+      @sub_router.get("/hello")
+      def hello():
+          return "Hello, world"
+
+      web_socket = SubRouter("/web_socket")
+
+      @web_socket.message()
+      async def hello():
+          return "Hello, world"
+
+      app.include_router(sub_router)
+      ```
+    </CodeGroup>
+
+  </Col>
+</Row>
+
+## 下一步
+
+现在，蝙蝠侠已经了解了如何组织代码，接下来他希望学习如何向代码中添加依赖项。Robyn 告诉他，依赖项可以在全局级别、路由器级别和视图级别进行添加。
+
+- [依赖注入](/documentation/zh/api_reference/dependency_injection)
