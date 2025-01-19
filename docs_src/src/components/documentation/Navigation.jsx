@@ -307,7 +307,7 @@ export const navigation = [
       {
         href: '/documentation/en/api_reference/dependency_injection',
         title: 'Dependency Injection',
-      }
+      },
     ],
   },
   {
@@ -377,27 +377,27 @@ export const navigation = [
 // Add translations for navigation titles
 const navigationTitles = {
   en: {
-    'Documentation': 'Documentation',
+    Documentation: 'Documentation',
     'Example Application': 'Example Application',
     'API Reference': 'API Reference',
     'Community Resources': 'Community Resources',
-    'Architecture': 'Architecture',
+    Architecture: 'Architecture',
     'Framework Comparison': 'Framework Comparison',
-    'Hosting': 'Hosting',
-    'Plugins': 'Plugins',
-    'Future Roadmap': 'Future Roadmap'
+    Hosting: 'Hosting',
+    Plugins: 'Plugins',
+    'Future Roadmap': 'Future Roadmap',
   },
   zh: {
-    'Documentation': '文档',
+    Documentation: '文档',
     'Example Application': '示例应用',
     'API Reference': 'API 参考',
     'Community Resources': '社区资源',
-    'Architecture': '架构',
+    Architecture: '架构',
     'Framework Comparison': '框架对比',
-    'Hosting': '托管',
-    'Plugins': '插件',
-    'Future Roadmap': '未来路线图'
-  }
+    Hosting: '托管',
+    Plugins: '插件',
+    'Future Roadmap': '未来路线图',
+  },
 }
 
 // Add translations for navigation titles and link titles
@@ -408,39 +408,41 @@ const translations = {
       'Getting Started': 'Getting Started',
       'Modeling Routes': 'Modeling Routes',
       'Authentication and Authorization': 'Authentication and Authorization',
-      'Middlewares': 'Middlewares',
+      Middlewares: 'Middlewares',
       'Real Time Notifications': 'Real Time Notifications',
       'Monitoring and Logging': 'Monitoring and Logging',
-      'Deployment': 'Deployment',
+      Deployment: 'Deployment',
       'OpenAPI Documentation': 'OpenAPI Documentation',
-      'Templates': 'Templates',
-      'SubRouters': 'SubRouters',
-      'Installation': 'Installation',
+      Templates: 'Templates',
+      SubRouters: 'SubRouters',
+      Installation: 'Installation',
       'The Request Object': 'The Request Object',
       'The Robyn Env file': 'The Robyn Env file',
-      'Middlewares, Events and Websockets': 'Middlewares, Events and Websockets',
-      'Authentication': 'Authentication',
-      'Const Requests and Multi Core Scaling': 'Const Requests and Multi Core Scaling',
-      'CORS': 'CORS',
-      'Templating': 'Templating',
-      'Redirection': 'Redirection',
+      'Middlewares, Events and Websockets':
+        'Middlewares, Events and Websockets',
+      Authentication: 'Authentication',
+      'Const Requests and Multi Core Scaling':
+        'Const Requests and Multi Core Scaling',
+      CORS: 'CORS',
+      Templating: 'Templating',
+      Redirection: 'Redirection',
       'File Uploads': 'File Uploads',
       'Form Data': 'Form Data',
-      'Websockets': 'Websockets',
-      'Exceptions': 'Exceptions',
+      Websockets: 'Websockets',
+      Exceptions: 'Exceptions',
       'Scaling the Application': 'Scaling the Application',
       'Advanced Features': 'Advanced Features',
       'Multiprocess Execution': 'Multiprocess Execution',
       'Direct Rust Usage': 'Direct Rust Usage',
       'GraphQL Support': 'GraphQL Support',
       'Dependency Injection': 'Dependency Injection',
-      'Talks': 'Talks',
-      'Blogs': 'Blogs',
-      'Introduction': 'Introduction',
+      Talks: 'Talks',
+      Blogs: 'Blogs',
+      Introduction: 'Introduction',
       'Upcoming Features': 'Upcoming Features',
-      'Railway': 'Railway',
-      'Exposing Ports': 'Exposing Ports'
-    }
+      Railway: 'Railway',
+      'Exposing Ports': 'Exposing Ports',
+    },
   },
   zh: {
     titles: navigationTitles.zh,
@@ -448,40 +450,40 @@ const translations = {
       'Getting Started': '开始使用',
       'Modeling Routes': '路由建模',
       'Authentication and Authorization': '身份验证和授权',
-      'Middlewares': '中间件',
+      Middlewares: '中间件',
       'Real Time Notifications': '实时通知',
       'Monitoring and Logging': '监控和日志',
-      'Deployment': '部署',
+      Deployment: '部署',
       'OpenAPI Documentation': 'OpenAPI 文档',
-      'Templates': '模板',
-      'SubRouters': '子路由',
-      'Installation': '安装',
+      Templates: '模板',
+      SubRouters: '子路由',
+      Installation: '安装',
       'The Request Object': '请求对象',
       'The Robyn Env file': 'Robyn 环境文件',
       'Middlewares, Events and Websockets': '中间件、事件和 WebSocket',
-      'Authentication': '身份验证',
+      Authentication: '身份验证',
       'Const Requests and Multi Core Scaling': '常量请求和多核心扩展',
-      'CORS': '跨域资源共享',
-      'Templating': '模板系统',
-      'Redirection': '重定向',
+      CORS: '跨域资源共享',
+      Templating: '模板系统',
+      Redirection: '重定向',
       'File Uploads': '文件上传',
       'Form Data': '表单数据',
-      'Websockets': 'WebSocket',
-      'Exceptions': '异常处理',
+      Websockets: 'WebSocket',
+      Exceptions: '异常处理',
       'Scaling the Application': '应用程序扩展',
       'Advanced Features': '高级功能',
       'Multiprocess Execution': '多进程执行',
       'Direct Rust Usage': '直接使用 Rust',
       'GraphQL Support': 'GraphQL 支持',
       'Dependency Injection': '依赖注入',
-      'Talks': '演讲',
-      'Blogs': '博客',
-      'Introduction': '介绍',
+      Talks: '演讲',
+      Blogs: '博客',
+      Introduction: '介绍',
       'Upcoming Features': '即将推出的功能',
-      'Railway': 'Railway',
-      'Exposing Ports': '端口暴露'
-    }
-  }
+      Railway: 'Railway',
+      'Exposing Ports': '端口暴露',
+    },
+  },
 }
 
 export function Navigation(props) {
@@ -492,18 +494,21 @@ export function Navigation(props) {
     if (href === '/documentation') {
       return `/documentation/${currentLanguage}`
     }
-    return href.replace('/documentation/en/', `/documentation/${currentLanguage}/`)
+    return href.replace(
+      '/documentation/en/',
+      `/documentation/${currentLanguage}/`
+    )
   }
 
   // Create localized navigation with translated titles and link titles
-  const localizedNavigation = navigation.map(group => ({
+  const localizedNavigation = navigation.map((group) => ({
     ...group,
     title: translations[currentLanguage].titles[group.title] || group.title,
-    links: group.links.map(link => ({
+    links: group.links.map((link) => ({
       ...link,
       title: translations[currentLanguage].links[link.title] || link.title,
-      href: getLocalizedHref(link.href)
-    }))
+      href: getLocalizedHref(link.href),
+    })),
   }))
 
   return (
@@ -513,8 +518,12 @@ export function Navigation(props) {
       </div>
       <ul role="list">
         <TopLevelNavItem href="/">API</TopLevelNavItem>
-        <TopLevelNavItem href="#">{currentLanguage === 'zh' ? '文档' : 'Documentation'}</TopLevelNavItem>
-        <TopLevelNavItem href="#">{currentLanguage === 'zh' ? '支持' : 'Support'}</TopLevelNavItem>
+        <TopLevelNavItem href="#">
+          {currentLanguage === 'zh' ? '文档' : 'Documentation'}
+        </TopLevelNavItem>
+        <TopLevelNavItem href="#">
+          {currentLanguage === 'zh' ? '支持' : 'Support'}
+        </TopLevelNavItem>
         {localizedNavigation.map((group, groupIndex) => (
           <NavigationGroup
             key={group.title}

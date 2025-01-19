@@ -125,7 +125,7 @@ export default function Home({ articles }) {
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
-                    href="/documentation"
+                    href="/documentation/en"
                     className="rounded-md bg-yellow-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-yellow-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
                   >
                     Get started
@@ -343,13 +343,13 @@ export default function Home({ articles }) {
               </p>
               <div className="mt-10 flex items-center justify-center gap-x-6">
                 <a
-                  href="/documentation/example_app"
+                  href="/documentation/en/example_app"
                   className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   Get started
                 </a>
                 <a
-                  href="/documentation/api_reference"
+                  href="/documentation/en/api_reference"
                   className="text-sm font-semibold leading-6 text-white"
                 >
                   Read the docs <span aria-hidden="true">→</span>

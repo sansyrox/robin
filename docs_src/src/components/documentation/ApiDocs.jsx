@@ -3,109 +3,108 @@ import { Heading } from '@/components/documentation/Heading'
 
 const guides = [
   {
-    href: '/documentation/api_reference',
+    href: '/documentation/en/api_reference',
     name: 'Installation',
     description: 'Start using Robyn in your project.',
   },
   {
-    href: '/documentation/api_reference/getting_started',
+    href: '/documentation/en/api_reference/getting_started',
     name: 'Getting Started',
     description: 'Start with creating basic routes in Robyn.',
   },
   {
-    href: '/documentation/api_reference/request_object',
+    href: '/documentation/en/api_reference/request_object',
     name: 'The Request Object',
     description: 'Learn about the Request Object in Robyn.',
   },
   {
-    href: '/documentation/api_reference/robyn_env',
+    href: '/documentation/en/api_reference/robyn_env',
     name: 'The Robyn Env file',
     description: 'Learn about the Robyn variables',
   },
   {
-    href: '/documentation/api_reference/middlewares',
+    href: '/documentation/en/api_reference/middlewares',
     name: 'Middlewares, Events and Websockets',
     description: 'Learn about Middlewares, Events and Websockets in Robyn.',
   },
   {
-    href: '/documentation/api_reference/authentication',
+    href: '/documentation/en/api_reference/authentication',
     name: 'Authentication',
     description: 'Learn about Authentication in Robyn.',
   },
   {
-    href: '/documentation/api_reference/const_requests',
+    href: '/documentation/en/api_reference/const_requests',
     name: 'Const Requests and Multi Core Scaling',
     description: 'Learn about Const Requests and Multi Core Scaling in Robyn.',
   },
   {
-    href: '/documentation/api_reference/cors',
+    href: '/documentation/en/api_reference/cors',
     name: 'CORS',
     description: 'CORS',
   },
   {
-    href: '/documentation/api_reference/templating',
+    href: '/documentation/en/api_reference/templating',
     name: 'Templating',
     description: 'Learn about Templating in Robyn.',
   },
   {
-    href: '/documentation/api_reference/redirection',
+    href: '/documentation/en/api_reference/redirection',
     name: 'Redirection',
     description: 'Learn how to redirect requests to different endpoints.',
   },
   {
-    href: '/documentation/api_reference/file-uploads',
+    href: '/documentation/en/api_reference/file-uploads',
     name: 'File Uploads',
     description:
       'Learn how to upload and download files to your server using Robyn.',
   },
   {
-    href: '/documentation/api_reference/form_data',
+    href: '/documentation/en/api_reference/form_data',
     name: 'Form Data and Multi Part Form Data',
     description: 'Learn how to handle form data.',
   },
   {
-    href: '/documentation/api_reference/websockets',
+    href: '/documentation/en/api_reference/websockets',
     name: 'Websockets',
     description: 'Learn how to use Websockets in Robyn.',
   },
   {
-    href: '/documentation/api_reference/exceptions',
+    href: '/documentation/en/api_reference/exceptions',
     name: 'Exceptions',
     description: 'Learn how to handle exceptions in Robyn.',
   },
   {
-    href: '/documentation/api_reference/scaling',
+    href: '/documentation/en/api_reference/scaling',
     name: 'Scaling the Application',
     description: 'Learn how to scaled Robyn across multiple cores.',
   },
   {
-    href: '/documentation/api_reference/advanced_features',
+    href: '/documentation/en/api_reference/advanced_features',
     name: 'Advanced Features',
     description: 'Learn about advanced features in Robyn.',
   },
   {
-    href: '/documentation/api_reference/multiprocess_execution',
+    href: '/documentation/en/api_reference/multiprocess_execution',
     name: 'Multiprocess Execution',
     description: 'Learn about the behaviour or variables during multithreading',
   },
   {
-    href: '/documentation/api_reference/using_rust_directly',
+    href: '/documentation/en/api_reference/using_rust_directly',
     name: 'Direct Rust Usage',
     description: 'Learn about directly using Rust in Robyn.',
   },
   {
-    href: '/documentation/api_reference/graphql-support',
+    href: '/documentation/en/api_reference/graphql-support',
     name: 'GraphQL Support',
     description: 'Learn about GraphQL Support in Robyn.',
   },
   {
-    href: '/documentation/api_reference/openapi',
+    href: '/documentation/en/api_reference/openapi',
     name: 'OpenAPI Documentation',
-    description:
-      'Learn how to generate OpenAPI docs for your applications.',
+    description: 'Learn how to generate OpenAPI docs for your applications.',
   },
   {
-    href: '/documentation/api_reference/dependency_injection',
+    href: '/documentation/en/api_reference/dependency_injection',
     name: 'Dependency Injection',
     description: 'Learn about Dependency Injection in Robyn.',
   },
